@@ -1,5 +1,3 @@
-import type { Role } from '@prisma/client';
-
 export type UserMeType = {
 	id: string;
 	name: string | null;
@@ -12,7 +10,7 @@ export type UserMeType = {
 export type UserShortType = {
 	id: string;
 	name: string | null;
-	role: Role;
+	role: string;
 };
 
 export type UserSpecType = {

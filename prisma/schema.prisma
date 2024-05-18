@@ -3,16 +3,9 @@ generator client {
 }
 
 datasource db {
-	provider  = "postgresql"
-	url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-	directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
-}
-
-enum Role {
-	OWNER
-	MANAGER
-	DEV
-	USER
+	provider = "postgresql"
+	url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+	// directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model User {
@@ -23,7 +16,7 @@ model User {
 	image         String?
 	password      String?
 	phone         String?
-	role          Role      @default(USER)
+	role          String    @default("USER")
 	accounts      Account[]
 	sessions      Session[]
 	times         Times[]

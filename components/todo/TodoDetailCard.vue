@@ -2,7 +2,6 @@
 	setup
 	lang="ts"
 >
-import { Role as UserRole } from '@prisma/client';
 import { useUserStore } from '~/store/user';
 import type { ITodo, TodoEditSchema } from '~/types/todo';
 
@@ -32,8 +31,8 @@ const checkEditRights = computed(() => {
 	if (!userStore.user?.role || !props.isEditable) {
 		return true;
 	}
-	const role = userStore.user?.role as UserRole;
-	return role !== UserRole.MANAGER && role !== UserRole.OWNER;
+	const role = userStore.user?.role
+	return !['MANAGER', 'OWNER'].includes(role);
 });
 const isEdited = computed(() => {
 	return state.description !== props.todo.description;

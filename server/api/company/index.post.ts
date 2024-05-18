@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client';
 import { dbClient } from '~/lib/dbClient';
 
 export default defineEventHandler(async (event) => {
@@ -14,7 +13,7 @@ export default defineEventHandler(async (event) => {
 				id: userId,
 			},
 			data: {
-				role: Role.OWNER,
+				role: "OWNER",
 				companyId: company.id,
 			},
 		});

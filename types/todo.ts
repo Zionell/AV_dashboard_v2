@@ -1,11 +1,11 @@
-import type { Role, Todo, TodoStatus } from '@prisma/client';
+import type { Todo, TodoStatus } from '@prisma/client';
 import { z } from 'zod';
 
 export interface ITodo extends Todo {
 	todoStatus: TodoStatus;
 	executor: {
 		name: string | null;
-		role: Role;
+		role: string;
 	};
 }
 

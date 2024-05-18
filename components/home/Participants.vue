@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import type { Role } from '@prisma/client';
-
 type UserType = {
 	id: string;
 	name: string | null;
 	image: string | null;
-	role: Role;
+	role: string;
 };
 
 type PropsType = {

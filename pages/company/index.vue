@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { type Company, Role as UserRole } from '@prisma/client';
-import { useUserStore } from '~/store/user';
-import { copyToClipboard, encrypt } from '~/utils/utils';
-import type { TableSortType } from '~/types';
+import type {Company} from '@prisma/client';
+import {useUserStore} from '~/store/user';
+import {copyToClipboard, encrypt} from '~/utils/utils';
+import type {TableSortType} from '~/types';
 
 const userStore = useUserStore();
 
@@ -48,7 +48,7 @@ const { data } = await useAsyncData(async () => {
 });
 const { pending, data: usersInfo } = await useLazyAsyncData(
 	() => {
-		const users = $fetch('/api/users/list', {
+		return $fetch('/api/users/list', {
 			query: {
 				companyId: userStore.getCompanyId,
 				take: pageInfo.value.take,
@@ -57,7 +57,6 @@ const { pending, data: usersInfo } = await useLazyAsyncData(
 				q: q.value,
 			},
 		});
-		return users;
 	},
 	{ watch: [page, sort, q] },
 );
@@ -91,8 +90,8 @@ const isVisible = computed<boolean>(() => {
 	if (!userStore.user?.role) {
 		return false;
 	}
-	const role = userStore.user?.role as UserRole;
-	return role === UserRole.MANAGER || role === UserRole.OWNER;
+	const role = userStore.user?.role
+	return ['MANAGER', 'OWNER'].includes(role);
 });
 
 const copyLink = async () => {
