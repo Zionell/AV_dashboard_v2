@@ -4,3 +4,4 @@ coverage
 .nuxt
 .node_modules
 old
+/prisma
