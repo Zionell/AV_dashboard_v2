@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    @font-face {
+        font-family: 'Itim';
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url(/fonts/itim.woff2) format('woff2');
+    }
+}
+@layer base {
+    body {
+        font-family: "Itim", sans-serif;
+    }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.swipe-enter-active,
+.swipe-leave-active {
+    transition: opacity .2s, transform .2s;
+}
+
+.swipe-enter,
+.swipe-leave-active {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+}
+
+.rotate-enter-active,
+.rotate-leave-active {
+    transition: opacity .2s, transform .2s;
+}
+
+.rotate-enter,
+.rotate-leave-active {
+    opacity: 0;
+    transform: rotate3d(1, 0, 0, 90deg);
+}
+
+.custom__scroll {
+    overflow-y: auto;
+    scrollbar-color: #fff8e8;
+    scrollbar-width: thin;
+}
+
+.custom__scroll::-webkit-scrollbar {
+    /* 1 - скроллбар */
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background: #fff8e8;
+    width: 10px;
+}
+
+.custom__scroll::-webkit-scrollbar-button {
+    /* 2 - кнопка */
+}
+
+.custom__scroll::-webkit-scrollbar-track {
+    /* 3 - трек */
+    border-radius: 10px;
+    border: 0.6px solid #f1f1f1;
+}
+
+.custom__scroll::-webkit-scrollbar-track-piece {
+    /* 4 - видимая часть трека */
+}
+
+.custom__scroll::-webkit-scrollbar-thumb {
+    /* 5 - ползунок */
+    background: #fb923c;
+    border-radius: 10px;
+    height: 20px;
+    width: 10px;
+}

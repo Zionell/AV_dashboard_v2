@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Times" ADD COLUMN     "month" INTEGER NOT NULL DEFAULT 1;

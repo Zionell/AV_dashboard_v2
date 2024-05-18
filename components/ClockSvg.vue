@@ -1,0 +1,73 @@
+<script setup lang="ts">
+defineProps({
+	sessionStatus: {
+		type: Boolean,
+		default: false,
+	},
+
+	error: {
+		type: Boolean,
+		default: false,
+	},
+});
+</script>
+
+<template>
+	<svg
+		class="ClockSvg w-10 h-10 text-orange-400"
+		viewBox="0 0 54 54"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg"
+	>
+		<path
+			d="M12.3859 0.299618C12.1145 -0.00755589 11.5939 0.106252 11.4965 0.494046L7.99693 14.4279C7.91695 14.7463 8.18459 15.0501 8.52874 15.0316L23.6214 14.2193C24.0413 14.1968 24.2509 13.7289 23.979 13.4212L19.9253 8.83296C22.1718 8.10389 24.5539 7.72309 27 7.72309C39.0714 7.72309 48.8571 17.0169 48.8571 28.4813C48.8571 39.9458 39.0714 49.2396 27 49.2396C14.9286 49.2396 5.14286 39.9458 5.14286 28.4813C5.14286 26.5567 5.41728 24.6717 5.95237 22.86L1.00063 21.5409C0.348672 23.7483 0 26.0761 0 28.4813C0 42.6433 12.0883 54.1238 27 54.1238C41.9117 54.1238 54 42.6433 54 28.4813C54 14.3193 41.9117 2.8388 27 2.8388C23.2492 2.8388 19.677 3.56517 16.4309 4.8779L12.3859 0.299618Z"
+			fill="currentColor"
+		/>
+		<path
+			:class="{ ClockSvg__path1: sessionStatus }"
+			d="M27 28V17"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+		/>
+		<path
+			:class="{ ClockSvg__path2: sessionStatus }"
+			d="M27 28.5V11"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+		/>
+	</svg>
+</template>
+
+<style>
+.ClockSvg__path1 {
+    transform-origin: center;
+    animation: minArrow 480s infinite;
+}
+
+.ClockSvg__path2 {
+    transform-origin: center;
+    animation: secArrow 120s infinite;
+}
+
+@keyframes minArrow {
+    from {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(10turn);
+    }
+}
+
+@keyframes secArrow {
+    from {
+        transform: rotate(0);
+    }
+
+    to {
+        transform: rotate(10turn);
+    }
+}
+</style>

@@ -1,0 +1,54 @@
+{
+    "name": "av_dashboard",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build",
+		"start": "nuxt start",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "prettier": "npx prettier",
+        "migrate": "prisma migrate deploy",
+        "migrate-dev": "prisma migrate dev",
+        "prisma-studio": "prisma studio"
+    },
+    "dependencies": {
+        "@auth/core": "^0.30.0",
+        "@auth/prisma-adapter": "^2.0.0",
+        "@nuxt/components": "^2.2.1",
+        "@nuxt/eslint": "^0.3.8",
+        "@nuxt/ui": "^2.15.2",
+        "@pinia/nuxt": "^0.5.1",
+        "@prisma/client": "^5.12.1",
+        "@sidebase/nuxt-auth": "^0.7.2",
+        "bcryptjs": "^2.4.3",
+        "jose": "^5.3.0",
+        "nuxt": "^3.11.2",
+        "pinia": "^2.1.7",
+        "vue-chart-3": "^3.1.8",
+        "vue-router": "^4.3.0",
+        "zod": "^3.22.5"
+    },
+    "devDependencies": {
+        "@nuxt/devtools": "latest",
+        "@nuxt/image": "^1.0.0",
+        "@nuxtjs/robots": "^3.0.0",
+        "@nuxtjs/sitemap": "^5.1.4",
+        "@types/bcryptjs": "^2.4.6",
+        "@types/node": "^20.12.7",
+        "nuxt-file-storage": "^0.2.2",
+        "nuxt-svgo": "^3.5.3",
+        "prettier": "3.2.5",
+        "prisma": "^5.12.1",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5",
+        "vue3-touch-events": "^4.1.8"
+    },
+    "overrides": {
+        "vue": "latest"
+    }
+}
