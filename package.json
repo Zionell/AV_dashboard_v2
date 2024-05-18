@@ -15,8 +15,7 @@
         "migrate": "prisma migrate deploy",
         "migrate-dev": "prisma migrate dev",
         "prisma-studio": "prisma studio",
-		"prisma:inline": "cp ./node_modules/.prisma/client/*.js ./node_modules/@prisma/client",
-		"prisma:generate": "prisma generate && npm run prisma:inline"
+		"prisma:generate": "prisma generate"
     },
     "dependencies": {
         "@auth/core": "^0.30.0",

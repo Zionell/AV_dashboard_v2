@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Times" ALTER COLUMN "month" DROP DEFAULT;
