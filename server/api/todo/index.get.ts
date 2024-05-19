@@ -39,6 +39,6 @@ export default defineEventHandler(async (event) => {
 	}
 	catch (e) {
 		console.warn('Todo/ get: ', e);
-		throw e;
+		return []
 	}
 });

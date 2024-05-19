@@ -25,6 +25,6 @@ export default defineEventHandler(async (event) => {
 	}
 	catch (e) {
 		console.warn('Material/ get: ', e);
-		throw e;
+		return {}
 	}
 });
