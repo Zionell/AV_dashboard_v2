@@ -40,7 +40,7 @@ export default defineNuxtConfig({
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 		},
 		authJs: {
-			secret: process.env.NUXT_NEXTAUTH_SECRET,
+			secret: process.env.AUTH_SECRET,
 		},
 	},
 
@@ -79,11 +79,14 @@ export default defineNuxtConfig({
 
 	// Auth
 	auth: {
+		isEnabled: true,
+		baseURL: process.env.AUTH_ORIGIN || env.SITE_URL,
 		provider: {
 			type: 'authjs',
 		},
-		globalAppMiddleware: true,
-		baseURL: env.SITE_URL,
+		globalAppMiddleware: {
+			isEnabled: true
+		}
 	},
 
 	// Color-mode
