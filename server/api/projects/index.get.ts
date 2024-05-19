@@ -1,5 +1,5 @@
-import { dbClient } from '~/lib/dbClient';
-import type { IProject } from '~/types/projects';
+import {dbClient} from '~/lib/dbClient';
+import type {IProject} from '~/types/projects';
 
 export default defineEventHandler(async (event): Promise<IProject[]> => {
 	try {
@@ -15,9 +15,9 @@ export default defineEventHandler(async (event): Promise<IProject[]> => {
 			where: {
 				users: {
 					some: {
-						userId,
+						userId: userId
 					},
-				},
+				}
 			},
 			include: {
 				todo: {
@@ -40,8 +40,7 @@ export default defineEventHandler(async (event): Promise<IProject[]> => {
 		});
 
 		return projects || [];
-	}
-	catch (e) {
+	} catch (e) {
 		console.warn('Projects all/ get: ', e);
 		throw e;
 	}

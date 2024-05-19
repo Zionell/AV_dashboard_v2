@@ -36,6 +36,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 			id: 'modal-success',
 			color: 'orange',
 		});
+		location.reload()
 	}
 	catch (e) {
 		console.warn('StartSession/ onSave: ', e);

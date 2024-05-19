@@ -116,8 +116,6 @@ model UsersOnProjects {
 	projectId String  @db.ObjectId
 
 	isCurrent Boolean @default(false)
-
-	@@unique([userId, projectId])
 }
 
 model Todo {

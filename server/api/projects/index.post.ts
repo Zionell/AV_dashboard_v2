@@ -1,34 +1,44 @@
-import { dbClient } from '~/lib/dbClient';
+import {dbClient} from '~/lib/dbClient';
+import {z} from "zod";
 
-type ImageType = {
-	content: string;
-};
-
-type BodyType = {
-	name: string;
-	companyId: string;
-	designUrl: string | null;
-	gitHub: string | null;
-	users: string[];
-	image: ImageType ;
-};
+const ProjectSchema = z.object({
+	name: z.string(),
+	designUrl: z.string().optional(),
+	gitHub: z.string().optional(),
+	projectUrl: z.string().optional(),
+	companyId: z.string(),
+})
 
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
-		const { name, designUrl, gitHub, companyId, users, image }: BodyType = body;
-		const { ext } = parseDataUrl(image.content);
+
+		const parsedBody = ProjectSchema.safeParse(body)
+		if (!parsedBody.success) {
+			throw createError({
+				statusCode: 400,
+				statusMessage: 'Error data',
+			})
+		}
+		const usersArr = body.users.length ? body.users : []
+		const {name} = parsedBody.data;
+		const image = body?.image?.content ?? '';
+		let imgUrl = '';
+
+		if (image) {
+			const {ext} = parseDataUrl(image);
+			imgUrl = `/images/projects/${name}.${ext}`
+
+			await storeFileLocally(image, name, '/projects');
+		}
 
 		await dbClient.project.create({
 			data: {
-				name,
-				designUrl,
-				gitHub,
-				companyId,
-				imgUrl: `/images/projects/${name}.${ext}`,
+				...parsedBody.data,
+				imgUrl,
 				users: {
 					create: [
-						...users.map((userId: string) => ({
+						...usersArr.map((userId: string) => ({
 							user: {
 								connect: {
 									id: userId,
@@ -40,13 +50,8 @@ export default defineEventHandler(async (event) => {
 			},
 		});
 
-		if (image?.content) {
-			await storeFileLocally(image.content, name, '/projects');
-		}
-
 		setResponseStatus(event, 201);
-	}
-	catch (e) {
+	} catch (e) {
 		console.warn('Projects/ post: ', e);
 		return e;
 	}
