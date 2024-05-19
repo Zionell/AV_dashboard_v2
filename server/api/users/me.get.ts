@@ -14,7 +14,6 @@ export default defineEventHandler(async (event) => {
 		}
 
 		const session = await getServerSession(event);
-		console.log('session', session)
 		if (!session) {
 			throw createError({
 				statusCode: 403,

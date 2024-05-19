@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
 				role: true,
 			},
 			orderBy: {
-				name: { sort: order, nulls: 'last' },
+				name: order,
 			},
 		});
 		const count = await dbClient.user.count({
