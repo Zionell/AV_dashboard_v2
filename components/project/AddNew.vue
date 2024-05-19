@@ -1,11 +1,16 @@
-<script setup lang="ts">
-import { z } from 'zod';
-import type { FormSubmitEvent } from '@nuxt/ui/dist/runtime/types';
-import { useUserStore } from '~/store/user';
-import type { UserShortType } from '~/types/user';
+<script
+	setup
+	lang="ts"
+>
+import {z} from 'zod';
+import type {FormSubmitEvent} from '@nuxt/ui/dist/runtime/types';
+import {useUserStore} from '~/store/user';
+import type {UserShortType} from '~/types/user';
+import {createId} from "~/utils/utils";
+import {put} from "@vercel/blob";
 
+const runtimeConfig = useRuntimeConfig()
 const emit = defineEmits(['refresh']);
-const { handleFileInput, files } = useFileStorage();
 const userStore = useUserStore();
 const toast = useToast();
 const schema = z.object({
@@ -23,6 +28,7 @@ const state = reactive({
 	projectUrl: undefined,
 });
 
+const files = ref(null)
 const selected = ref<UserShortType[] | []>([]);
 const loading = ref(false);
 
@@ -44,17 +50,31 @@ const onSearch = async (search: string) => {
 };
 const isLoading = ref<boolean>(false);
 const isOpen = ref<boolean>(false);
-
+const handleFileInput = (evt: InputEvent) => {
+	const file = evt.target?.files[0]
+	if (file) {
+		files.value = file
+	}
+}
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 	try {
 		isLoading.value = true;
 		const users = selected.value.map(s => s.id) || [];
+		let imgUrl = ''
+		if (files.value) {
+			const fileName = files.value?.name ?? createId();
 
+			const {url} = await put(`projects/${fileName}`, files.value, {
+				access: 'public',
+				token: runtimeConfig.public.blob
+			});
+			imgUrl = url
+		}
 		await $fetch('/api/projects', {
 			method: 'POST',
 			body: {
 				...event.data,
-				image: files.value[0],
+				imgUrl,
 				users: users,
 				companyId: userStore.getCompanyId,
 			},
@@ -65,11 +85,9 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 			color: 'orange',
 		});
 		emit('refresh');
-	}
-	catch (e) {
+	} catch (e) {
 		console.warn('ProjectAddNew/ onSave: ', e);
-	}
-	finally {
+	} finally {
 		isLoading.value = false;
 		isOpen.value = false;
 	}

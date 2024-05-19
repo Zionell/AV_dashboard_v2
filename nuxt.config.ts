@@ -5,6 +5,7 @@ import getRobotsInfo from './config/robots';
 
 interface IEnv {
 	SITE_URL: string;
+	BLOB_READ_WRITE_TOKEN: string;
 	STORAGE_URL: string;
 	JWT_SALT: string;
 	DEV: boolean;
@@ -12,6 +13,7 @@ interface IEnv {
 
 const env: IEnv = {
 	SITE_URL: process.env.NUXT_PUBLIC_SITE_URL || 'https://av-dashboard-v2.vercel.app/',
+	BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN || '',
 	STORAGE_URL: process.env.STORAGE_URL || '',
 	JWT_SALT: process.env.NUXT_JWT_SALT || '',
 	DEV: process.env.NODE_ENV === 'development',
@@ -34,6 +36,7 @@ export default defineNuxtConfig({
 		...env,
 		public: {
 			salt: env.JWT_SALT,
+			blob: env.BLOB_READ_WRITE_TOKEN || '',
 		},
 		googleAuth: {
 			clientId: process.env.GOOGLE_CLIENT_ID,
@@ -62,10 +65,6 @@ export default defineNuxtConfig({
 		'@sidebase/nuxt-auth',
 		'nuxt-file-storage',
 	],
-
-	fileStorage: {
-		mount: env.STORAGE_URL,
-	},
 
 	build: {
 		transpile: ['jsonwebtoken'],

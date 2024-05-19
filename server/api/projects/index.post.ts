@@ -1,11 +1,13 @@
 import {dbClient} from '~/lib/dbClient';
 import {z} from "zod";
 
+
 const ProjectSchema = z.object({
 	name: z.string(),
 	designUrl: z.string().optional(),
 	gitHub: z.string().optional(),
 	projectUrl: z.string().optional(),
+	imgUrl: z.string().optional(),
 	companyId: z.string(),
 })
 
@@ -20,22 +22,12 @@ export default defineEventHandler(async (event) => {
 				statusMessage: 'Error data',
 			})
 		}
+
 		const usersArr = body.users.length ? body.users : []
-		const {name} = parsedBody.data;
-		const image = body?.image?.content ?? '';
-		let imgUrl = '';
-
-		if (image) {
-			const {ext} = parseDataUrl(image);
-			imgUrl = `/images/projects/${name}.${ext}`
-
-			await storeFileLocally(image, name, '/projects');
-		}
 
 		await dbClient.project.create({
 			data: {
 				...parsedBody.data,
-				imgUrl,
 				users: {
 					create: [
 						...usersArr.map((userId: string) => ({
