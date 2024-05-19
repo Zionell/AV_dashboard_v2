@@ -63,7 +63,6 @@ export default defineNuxtConfig({
 		'@pinia/nuxt',
 		'@nuxt/eslint',
 		'@sidebase/nuxt-auth',
-		'nuxt-file-storage',
 	],
 
 	build: {
