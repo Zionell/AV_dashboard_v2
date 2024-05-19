@@ -1,4 +1,4 @@
-import { defineNuxtConfig } from 'nuxt/config';
+import {defineNuxtConfig} from 'nuxt/config';
 import headConfig from './config/head.config';
 import pluginsConfig from './config/pluginsConfig';
 import getRobotsInfo from './config/robots';
@@ -11,7 +11,7 @@ interface IEnv {
 }
 
 const env: IEnv = {
-	SITE_URL: process.env.NUXT_PUBLIC_SITE_URL || '',
+	SITE_URL: process.env.NUXT_PUBLIC_SITE_URL || 'https://av-dashboard-v2.vercel.app/',
 	STORAGE_URL: process.env.STORAGE_URL || '',
 	JWT_SALT: process.env.NUXT_JWT_SALT || '',
 	DEV: process.env.NODE_ENV === 'development',
@@ -72,9 +72,9 @@ export default defineNuxtConfig({
 	},
 
 	// Route rules
-	routeRules: {
-		// Cached for 1 hour
-		// "/api/*": { cache: { maxAge: 60 * 60 } },
+	routeRules: env.DEV ? {} : {
+		// Cached for 15 min
+		"/api/*": {cache: {maxAge: 60 * 15}},
 	},
 
 	// Auth
@@ -83,9 +83,7 @@ export default defineNuxtConfig({
 			type: 'authjs',
 		},
 		globalAppMiddleware: true,
-		baseURL: env.DEV
-			? 'http://localhost:3000'
-			: process.env.NUXT_NEXTAUTH_URL,
+		baseURL: env.SITE_URL,
 	},
 
 	// Color-mode
@@ -145,7 +143,7 @@ export default defineNuxtConfig({
 		inject: true,
 		quality: 80,
 		domains: [env.SITE_URL],
-		screens: { ...breakpoints, desktop: 1920 },
+		screens: {...breakpoints, desktop: 1920},
 		format: ['webp'],
 	}, // Image end
 
@@ -160,6 +158,6 @@ export default defineNuxtConfig({
 
 	app: {
 		head: headConfig,
-		pageTransition: { name: 'page', mode: 'out-in' },
+		pageTransition: {name: 'page', mode: 'out-in'},
 	},
 });

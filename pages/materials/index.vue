@@ -13,7 +13,7 @@ const { data, refresh } = await useAsyncData(async () => {
 	const [materials] = await Promise.all([
 		$fetch('/api/materials', {
 			query: {
-				userId: userStore.getUserId,
+				companyId: userStore.getCompanyId,
 				take: pageInfo.value.take,
 				skip: pageInfo.value.take * (page.value - 1),
 			},

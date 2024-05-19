@@ -9,7 +9,6 @@ export default defineEventHandler(async (event) => {
 			skip: Number(skip),
 			where: {
 				companyId: companyId,
-				projectId: null,
 			},
 			include: {
 				category: true,
