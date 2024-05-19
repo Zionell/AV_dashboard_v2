@@ -1,4 +1,7 @@
-<script setup lang="ts">
+<script
+	setup
+	lang="ts"
+>
 import type {Company} from '@prisma/client';
 import {useUserStore} from '~/store/user';
 import {copyToClipboard, encrypt} from '~/utils/utils';
@@ -37,18 +40,17 @@ const sort = ref<TableSortType>({
 });
 const q = ref('');
 
-const { data } = await useAsyncData(async () => {
+const {data} = await useAsyncData(async () => {
 	const company = await $fetch('/api/company', {
 		params: {
 			id: userStore.getCompanyId,
 		},
 	});
 
-	return { company };
+	return {company};
 });
-const { pending, data: usersInfo } = await useLazyAsyncData(
-	() => {
-		return $fetch('/api/users/list', {
+const {pending, data: usersInfo} = await useLazyAsyncData(async () => {
+		const users = await $fetch('/api/users/list', {
 			query: {
 				companyId: userStore.getCompanyId,
 				take: pageInfo.value.take,
@@ -56,9 +58,11 @@ const { pending, data: usersInfo } = await useLazyAsyncData(
 				order: sort.value.direction,
 				q: q.value,
 			},
-		});
+		})
+
+		return users
 	},
-	{ watch: [page, sort, q] },
+	{watch: [page, sort, q]},
 );
 
 const companyInfo = computed((): Company | null => {
@@ -119,10 +123,9 @@ const items = (email: string) => [
 const removeByEmail = (email: string) => {
 	try {
 		$fetch('/api/users/list', {
-			query: { email },
+			query: {email},
 		});
-	}
-	catch (e) {
+	} catch (e) {
 		console.warn('Company / removeByEmail: ', e);
 	}
 };

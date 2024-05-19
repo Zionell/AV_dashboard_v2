@@ -16,10 +16,6 @@ export default defineEventHandler(async (event): Promise<Company | null> => {
 						role: true,
 					},
 				},
-				materials: {
-					skip: 0,
-					take: 10,
-				},
 			},
 		});
 

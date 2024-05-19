@@ -79,14 +79,11 @@ export default defineNuxtConfig({
 
 	// Auth
 	auth: {
-		isEnabled: true,
 		baseURL: process.env.AUTH_ORIGIN || env.SITE_URL,
 		provider: {
 			type: 'authjs',
 		},
-		globalAppMiddleware: {
-			isEnabled: true
-		}
+		globalAppMiddleware: true
 	},
 
 	// Color-mode

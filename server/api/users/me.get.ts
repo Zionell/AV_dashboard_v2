@@ -4,7 +4,7 @@ import { dbClient } from '~/lib/dbClient';
 export default defineEventHandler(async (event) => {
 	try {
 		const cookies = parseCookies(event)
-		const sessionToken = cookies['next-auth.session-token']
+		const sessionToken = cookies['next-auth.session-token'] || cookies['__Secure-next-auth.session-token'];
 
 		if (!sessionToken) {
 			throw createError({
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
 		}
 
 		const session = await getServerSession(event);
-
+		console.log('session', session)
 		if (!session) {
 			throw createError({
 				statusCode: 403,
