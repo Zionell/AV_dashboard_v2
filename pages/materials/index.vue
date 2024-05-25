@@ -1,4 +1,10 @@
 <script setup lang="ts">
+definePageMeta({
+	pageTransition: {
+		name: 'rotate'
+	}
+})
+
 import { useUserStore } from '~/store/user';
 
 const userStore = useUserStore();

@@ -1,4 +1,10 @@
 <script setup lang="ts">
+definePageMeta({
+	pageTransition: {
+		name: 'rotate'
+	}
+})
+
 import type { TimeType } from '~/types';
 import { daysArrayByCurMonth } from '~/utils/dateTimeUtils';
 import { useUserStore } from '~/store/user';

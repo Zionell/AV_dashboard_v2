@@ -2,6 +2,12 @@
 	setup
 	lang="ts"
 >
+definePageMeta({
+	pageTransition: {
+		name: 'rotate'
+	}
+})
+
 import type {Company} from '@prisma/client';
 import {useUserStore} from '~/store/user';
 import {copyToClipboard, encrypt} from '~/utils/utils';

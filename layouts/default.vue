@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="grid grid-cols-layout-col grid-rows-layout-row min-h-screen bg-white text-black font-custom"
+		class="grid grid-cols-layout-col grid-rows-layout-row min-h-screen bg-white text-black font-custom overflow-hidden"
 	>
 		<LayoutHeader />
 		<LayoutNavBar class="col-start-1 row-start-1 row-end-3" />

@@ -4,7 +4,10 @@ import { getJWTPayload } from '~/utils/utils';
 definePageMeta({
 	auth: false,
 	layout: 'empty',
-});
+	pageTransition: {
+		name: 'rotate'
+	}
+})
 
 const { query } = useRoute();
 const router = useRouter();
