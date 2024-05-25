@@ -3,28 +3,27 @@ import { dbClient } from '~/lib/dbClient';
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
-		const {name, description, sourceLink, companyId, projectId, categoryId} = body;
 
 		await dbClient.material.create({
 			data: {
-				name: name ?? '',
-				description: description ?? '',
-				sourceLink: sourceLink ?? '',
-				project: projectId ? {
+				name: body?.name ?? '',
+				description: body?.description ?? '',
+				sourceLink: body?.sourceLink ?? '',
+				project: body?.projectId ? {
 					connect: {
-						id: projectId,
+						id: body.projectId,
 					}
 				} : {},
-				company: {
+				company: body?.companyId ?{
 					connect: {
-						id: companyId,
+						id: body.companyId,
 					}
-				},
-				category: {
+				}: {},
+				category: body?.categoryId ?{
 					connect: {
-						id: categoryId,
+						id: body.categoryId,
 					}
-				}
+				}: {}
 			},
 		});
 

@@ -4,28 +4,26 @@ export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
 
-		const {name, description, isCompleted, executorId, projectId, todoStatusId} = body;
-
 		await dbClient.todo.create({
 			data: {
-				name: name ?? '',
-				description: description ?? '',
-				isCompleted: isCompleted ?? false,
-				project: {
+				name: body?.name ?? '',
+				description: body?.description ?? '',
+				isCompleted: body?.isCompleted ?? false,
+				project: body?.projectId ? {
 					connect: {
-						id: projectId,
+						id: body.projectId,
 					}
-				},
-				executor: {
+				} : {},
+				executor: body?.executorId ? {
 					connect: {
-						id: executorId,
+						id: body.executorId,
 					}
-				},
-				todoStatus: {
+				} : {},
+				todoStatus: body?.todoStatusId ? {
 					connect: {
-						id: todoStatusId,
+						id: body.todoStatusId,
 					}
-				}
+				} : {}
 			},
 		});
 
