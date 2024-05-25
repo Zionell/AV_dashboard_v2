@@ -3,9 +3,29 @@ import { dbClient } from '~/lib/dbClient';
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
+		const {name, description, sourceLink, companyId, projectId, categoryId} = body;
 
 		await dbClient.material.create({
-			data: body,
+			data: {
+				name: name ?? '',
+				description: description ?? '',
+				sourceLink: sourceLink ?? '',
+				project: projectId ? {
+					connect: {
+						id: projectId,
+					}
+				} : {},
+				company: {
+					connect: {
+						id: companyId,
+					}
+				},
+				category: {
+					connect: {
+						id: categoryId,
+					}
+				}
+			},
 		});
 
 		setResponseStatus(event, 201);

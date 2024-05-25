@@ -8,7 +8,6 @@ const ProjectSchema = z.object({
 	gitHub: z.string().optional(),
 	projectUrl: z.string().optional(),
 	imgUrl: z.string().optional(),
-	companyId: z.string(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -22,12 +21,17 @@ export default defineEventHandler(async (event) => {
 				statusMessage: 'Error data',
 			})
 		}
-
+		const companyId = body.companyId
 		const usersArr = body.users.length ? body.users : []
 
 		await dbClient.project.create({
 			data: {
 				...parsedBody.data,
+				company: {
+					connect: {
+						id: companyId,
+					}
+				},
 				users: {
 					create: [
 						...usersArr.map((userId: string) => ({
