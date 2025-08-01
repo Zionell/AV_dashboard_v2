@@ -1,5 +1,5 @@
-import type { Company } from '@prisma/client';
-import { dbClient } from '~/lib/dbClient';
+import type { Company } from "@prisma/client";
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event): Promise<Company | null> => {
 	try {
@@ -20,9 +20,8 @@ export default defineEventHandler(async (event): Promise<Company | null> => {
 		});
 
 		return company || null;
-	}
-	catch (e) {
-		console.warn('Company/ get: ', e);
+	} catch (e) {
+		console.warn("Company/ get: ", e);
 		throw e;
 	}
 });

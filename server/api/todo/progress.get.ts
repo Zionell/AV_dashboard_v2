@@ -1,4 +1,4 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -18,10 +18,9 @@ export default defineEventHandler(async (event) => {
 			}),
 		]);
 
-		return { allTodos, completed	};
-	}
-	catch (e) {
-		console.warn('Todo progress/ get: ', e);
+		return { allTodos, completed };
+	} catch (e) {
+		console.warn("Todo progress/ get: ", e);
 		throw e;
 	}
 });

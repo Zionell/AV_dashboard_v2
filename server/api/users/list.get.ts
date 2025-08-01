@@ -1,5 +1,5 @@
-import { dbClient } from '~/lib/dbClient';
-import type { SortType } from '~/types';
+import { dbClient } from "~~/lib/dbClient";
+import type { SortType } from "~/types";
 
 type QueryType = {
 	companyId: string;
@@ -11,7 +11,13 @@ type QueryType = {
 
 export default defineEventHandler(async (event) => {
 	try {
-		const { companyId, take = '100', skip = '0', order = 'desc', q }: QueryType = getQuery(event);
+		const {
+			companyId,
+			take = "100",
+			skip = "0",
+			order = "desc",
+			q,
+		}: QueryType = getQuery(event);
 
 		const users = await dbClient.user.findMany({
 			take: Number(take),
@@ -20,7 +26,7 @@ export default defineEventHandler(async (event) => {
 				companyId: companyId,
 				name: {
 					contains: q,
-					mode: 'insensitive',
+					mode: "insensitive",
 				},
 			},
 			select: {
@@ -40,9 +46,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		return { users, count };
-	}
-	catch (e) {
-		console.warn('User list/ get: ', e);
+	} catch (e) {
+		console.warn("User list/ get: ", e);
 		throw e;
 	}
 });

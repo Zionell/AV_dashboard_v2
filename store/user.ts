@@ -1,29 +1,31 @@
-import { defineStore } from 'pinia';
-import type { UserMeType } from '~/types/user';
+import { defineStore } from "pinia";
+import type { UserMeType } from "../types/store/user";
 
-export const useUserStore = defineStore('user', {
-	state: (): { user: UserMeType | null } => ({
+interface IState {
+	user: UserMeType | null;
+}
+
+export const useUserStore = defineStore("user", () => {
+	const state = reactive<IState>({
 		user: null,
-	}),
+	});
 
-	getters: {
-		getUser: state => state.user,
-		getUserId: state => state.user?.id,
-		getCompanyId: state => state.user?.companyId,
-	},
+	async function fetchUser(headers: Readonly<Record<string, string>>) {
+		try {
+			const { data: user } = await useFetch<UserMeType>("/api/users/me", {
+				headers,
+			});
 
-	actions: {
-		async setUser(headers: Readonly<Record<string, string>>) {
-			try {
-				const user = await $fetch('/api/users/me', { headers });
-
-				if (user) {
-					this.user = { ...user };
-				}
+			if (user.value) {
+				state.user = { ...user.value };
 			}
-			catch (e) {
-				console.warn('User store / setUser: ', e);
-			}
-		},
-	},
+		} catch (e) {
+			console.warn("User store / setUser: ", e);
+		}
+	}
+
+	return {
+		...toRefs(state),
+		fetchUser,
+	};
 });

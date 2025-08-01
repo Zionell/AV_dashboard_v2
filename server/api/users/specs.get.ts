@@ -1,5 +1,5 @@
-import { dbClient } from '~/lib/dbClient';
-import type { UserSpecType } from '~/types/user';
+import { dbClient } from "~~/lib/dbClient";
+import type { UserSpecType } from "~/types/user";
 
 export default defineEventHandler(async (event): Promise<UserSpecType[]> => {
 	try {
@@ -17,9 +17,8 @@ export default defineEventHandler(async (event): Promise<UserSpecType[]> => {
 		});
 
 		return items || [];
-	}
-	catch (e) {
-		console.warn('Projects specs/ get: ', e);
+	} catch (e) {
+		console.warn("Projects specs/ get: ", e);
 		throw e;
 	}
 });

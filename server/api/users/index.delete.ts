@@ -1,4 +1,4 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -11,9 +11,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		setResponseStatus(event, 204);
-	}
-	catch (e) {
-		console.warn('User/ delete: ', e);
+	} catch (e) {
+		console.warn("User/ delete: ", e);
 		throw e;
 	}
 });

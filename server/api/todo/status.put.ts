@@ -1,8 +1,9 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
-		const { id, statusId }: { id: string; statusId: string } = getQuery(event);
+		const { id, statusId }: { id: string; statusId: string } =
+			getQuery(event);
 
 		await dbClient.todo.update({
 			where: {
@@ -14,9 +15,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		setResponseStatus(event, 204);
-	}
-	catch (e) {
-		console.warn('Todo status/ put: ', e);
+	} catch (e) {
+		console.warn("Todo status/ put: ", e);
 		return e;
 	}
 });

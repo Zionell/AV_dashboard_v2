@@ -1,4 +1,4 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -16,9 +16,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		return items || [];
-	}
-	catch (e) {
-		console.warn('Todo spec/ get: ', e);
+	} catch (e) {
+		console.warn("Todo spec/ get: ", e);
 		throw e;
 	}
 });

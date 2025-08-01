@@ -1,6 +1,5 @@
-import {dbClient} from '~/lib/dbClient';
-import {z} from "zod";
-
+import { dbClient } from "~~/lib/dbClient";
+import { z } from "zod";
 
 const ProjectSchema = z.object({
 	name: z.string(),
@@ -8,21 +7,21 @@ const ProjectSchema = z.object({
 	gitHub: z.string().optional(),
 	projectUrl: z.string().optional(),
 	imgUrl: z.string().optional(),
-})
+});
 
 export default defineEventHandler(async (event) => {
 	try {
 		const body = await readBody(event);
 
-		const parsedBody = ProjectSchema.safeParse(body)
+		const parsedBody = ProjectSchema.safeParse(body);
 		if (!parsedBody.success) {
 			throw createError({
 				statusCode: 400,
-				statusMessage: 'Error data',
-			})
+				statusMessage: "Error data",
+			});
 		}
-		const companyId = body.companyId
-		const usersArr = body.users.length ? body.users : []
+		const companyId = body.companyId;
+		const usersArr = body.users.length ? body.users : [];
 
 		await dbClient.project.create({
 			data: {
@@ -30,7 +29,7 @@ export default defineEventHandler(async (event) => {
 				company: {
 					connect: {
 						id: companyId,
-					}
+					},
 				},
 				users: {
 					create: [
@@ -48,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
 		setResponseStatus(event, 201);
 	} catch (e) {
-		console.warn('Projects/ post: ', e);
+		console.warn("Projects/ post: ", e);
 		return e;
 	}
 });

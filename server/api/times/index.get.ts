@@ -1,18 +1,19 @@
-import { dbClient } from '~/lib/dbClient';
-import type { TimeType } from '~/types';
+import { dbClient } from "~~/lib/dbClient";
+import type { TimeType } from "~/types";
 
 export default defineEventHandler(async (event): Promise<TimeType[]> => {
 	try {
-		const { userId, month }: { userId: string; month: string } = getQuery(event);
+		const { userId, month }: { userId: string; month: string } =
+			getQuery(event);
 
 		const items = await dbClient.times.groupBy({
-			by: ['date'],
+			by: ["date"],
 			where: {
 				month: Number(month),
 				userId,
 			},
 			orderBy: {
-				date: 'asc',
+				date: "asc",
 			},
 			_sum: {
 				times: true,
@@ -20,9 +21,8 @@ export default defineEventHandler(async (event): Promise<TimeType[]> => {
 		});
 
 		return items || [];
-	}
-	catch (e) {
-		console.warn('Times all/ get: ', e);
+	} catch (e) {
+		console.warn("Times all/ get: ", e);
 		throw e;
 	}
 });

@@ -1,11 +1,11 @@
-import { z } from 'zod';
-import bcryptjs from 'bcryptjs';
-import Google from 'next-auth/providers/google';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { PrismaAdapter } from '@auth/prisma-adapter';
-import type { Adapter } from '@auth/core/adapters';
-import { dbClient } from '~/lib/dbClient';
-import { NuxtAuthHandler } from '#auth';
+import { z } from "zod";
+import bcryptjs from "bcryptjs";
+import Google from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import type { Adapter } from "@auth/core/adapters";
+import { dbClient } from "~~/lib/dbClient";
+import { NuxtAuthHandler } from "#auth";
 
 const runtimeConfig = useRuntimeConfig();
 
@@ -13,10 +13,10 @@ export default NuxtAuthHandler({
 	secret: runtimeConfig.authJs.secret,
 	// @ts-expect-error
 	adapter: PrismaAdapter(dbClient) as Adapter,
-	session: { strategy: 'jwt' },
+	session: { strategy: "jwt" },
 	pages: {
-		signIn: '/auth/login',
-		error: '/error',
+		signIn: "/auth/login",
+		error: "/error",
 	},
 	providers: [
 		// @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
@@ -37,10 +37,10 @@ export default NuxtAuthHandler({
 					})
 					.safeParse(credentials);
 				if (parsedCredentials.success) {
-					const { type, email, password, name, companyId }
-                        = parsedCredentials.data;
+					const { type, email, password, name, companyId } =
+						parsedCredentials.data;
 
-					if (type === 'registration') {
+					if (type === "registration") {
 						const isExistUser = await dbClient.user.findUnique({
 							where: {
 								email: email,
@@ -48,7 +48,7 @@ export default NuxtAuthHandler({
 						});
 
 						if (isExistUser) {
-							throw new Error('Пользователь уже зарегистрирован');
+							throw new Error("Пользователь уже зарегистрирован");
 						}
 
 						const salt = bcryptjs.genSaltSync(10);
@@ -67,7 +67,7 @@ export default NuxtAuthHandler({
 						where: { email },
 					});
 					if (!user) {
-						throw new Error('Пользователь не найден');
+						throw new Error("Пользователь не найден");
 					}
 
 					const checkPassword = await bcryptjs.compare(
@@ -75,7 +75,7 @@ export default NuxtAuthHandler({
 						String(user.password),
 					);
 					if (!checkPassword) {
-						throw new Error('Email или пароль введены неправильно');
+						throw new Error("Email или пароль введены неправильно");
 					}
 
 					return user;

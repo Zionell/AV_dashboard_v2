@@ -1,8 +1,12 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
-		const { companyId, take = '100', skip = '0' }: { companyId: string; take: string; skip: string } = getQuery(event);
+		const {
+			companyId,
+			take = "100",
+			skip = "0",
+		}: { companyId: string; take: string; skip: string } = getQuery(event);
 
 		const material = await dbClient.material.findMany({
 			take: Number(take),
@@ -22,9 +26,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		return { material, count };
-	}
-	catch (e) {
-		console.warn('Material/ get: ', e);
-		return {}
+	} catch (e) {
+		console.warn("Material/ get: ", e);
+		return {};
 	}
 });

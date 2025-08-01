@@ -1,5 +1,5 @@
-import type { Project } from '@prisma/client';
-import { dbClient } from '~/lib/dbClient';
+import type { Project } from "@prisma/client";
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event): Promise<Project | null> => {
 	try {
@@ -17,9 +17,8 @@ export default defineEventHandler(async (event): Promise<Project | null> => {
 		});
 
 		return project[0] || null;
-	}
-	catch (e) {
-		console.warn('Projects current/ get: ', e);
+	} catch (e) {
+		console.warn("Projects current/ get: ", e);
 		throw e;
 	}
 });

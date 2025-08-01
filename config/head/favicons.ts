@@ -1,4 +1,4 @@
-import type { FaviconMetaType, FaviconType } from '~/types/favicons';
+import type { FaviconMetaType, FaviconType } from "./types";
 
 export const faviconsLinks: FaviconType[] = [
 	{

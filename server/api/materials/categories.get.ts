@@ -1,4 +1,4 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -13,9 +13,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		return categories || [];
-	}
-	catch (e) {
-		console.warn('MaterialCategory/ get: ', e);
+	} catch (e) {
+		console.warn("MaterialCategory/ get: ", e);
 		throw e;
 	}
 });

@@ -1,8 +1,12 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
-		const { userId, take = '100', skip = '0' }: { userId: string; take: string; skip: string } = getQuery(event);
+		const {
+			userId,
+			take = "100",
+			skip = "0",
+		}: { userId: string; take: string; skip: string } = getQuery(event);
 
 		const curProjectId = await dbClient.usersOnProjects.findFirst({
 			where: {
@@ -15,7 +19,7 @@ export default defineEventHandler(async (event) => {
 		});
 
 		if (!curProjectId) {
-			throw new Error('Todo for current project is not found');
+			throw new Error("Todo for current project is not found");
 		}
 
 		const items = await dbClient.todo.findMany({
@@ -36,9 +40,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		return items || [];
-	}
-	catch (e) {
-		console.warn('Todo/ get: ', e);
-		return []
+	} catch (e) {
+		console.warn("Todo/ get: ", e);
+		return [];
 	}
 });

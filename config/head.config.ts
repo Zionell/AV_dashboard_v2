@@ -1,12 +1,11 @@
 import { faviconsLinks, faviconsMeta } from './head/favicons';
-import { headNoScripts, headScripts } from './head/scripts';
 
-const base_url = process.env.SERVER_API;
+const base_url = process.env.AUTH_ORIGIN;
 
-const title = 'AV_Dashboard';
-const description
+const title: string = 'AV_Dashboard';
+const description: string
     = 'Управляйте процессом разработки с помощью нашего мощного инструмента для управления задачами. Наш сайт предлагает множество возможностей для организации и управления проектами, включая планирование, трекинг, отслеживание и отчетность. Общайтесь с командой, делитесь файлами и совместно решайте задачи в одном месте. Присоединяйтесь к нам сейчас и управляйте разработкой эффективно и профессионально.';
-const imageUrl = '/images/seo.png';
+const imageUrl: string = '/images/seo.png';
 
 const headConfig = {
 	htmlAttrs: { lang: 'ru' },
@@ -70,10 +69,6 @@ const headConfig = {
 		// Favicons
 		...faviconsLinks,
 	],
-
-	script: process.env.GTM !== 'False' ? [...headScripts] : [],
-	//
-	noscript: process.env.GTM !== 'False' ? [...headNoScripts] : [],
 };
 
 export default headConfig;

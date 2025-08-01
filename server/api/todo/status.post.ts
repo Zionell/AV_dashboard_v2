@@ -1,4 +1,4 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
@@ -9,9 +9,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		setResponseStatus(event, 201);
-	}
-	catch (e) {
-		console.warn('TodoStatus/ post: ', e);
+	} catch (e) {
+		console.warn("TodoStatus/ post: ", e);
 		throw e;
 	}
 });

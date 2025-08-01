@@ -1,8 +1,9 @@
-import { dbClient } from '~/lib/dbClient';
+import { dbClient } from "~~/lib/dbClient";
 
 export default defineEventHandler(async (event) => {
 	try {
-		const { companyId, search }: { companyId: string; search: string } = getQuery(event);
+		const { companyId, search }: { companyId: string; search: string } =
+			getQuery(event);
 
 		const users = await dbClient.user.findMany({
 			take: 10,
@@ -21,9 +22,8 @@ export default defineEventHandler(async (event) => {
 		});
 
 		return users || [];
-	}
-	catch (e) {
-		console.warn('User search/ get: ', e);
+	} catch (e) {
+		console.warn("User search/ get: ", e);
 		throw e;
 	}
 });

@@ -24,3 +24,5 @@ logs
 
 template
 /old
+
+/generated/prisma
