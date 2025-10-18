@@ -1,5 +1,5 @@
-import type { Project } from '@prisma/client';
-import type { UserItemType } from '~/types/user';
+import type { Project } from "@prisma/client";
+import { UserItemType } from "./user";
 
 type ProjectTodoType = {
 	isCompleted: boolean;

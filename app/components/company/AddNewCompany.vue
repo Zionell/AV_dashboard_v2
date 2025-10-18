@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { z } from 'zod';
-import type { FormSubmitEvent } from '@nuxt/ui/dist/runtime/types';
-import { useUserStore } from '~/store/user';
+import { z } from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import { useUserStore } from "~/store/user";
 
-const headers = useRequestHeaders(['cookie']) as HeadersInit;
+const headers = useRequestHeaders(["cookie"]) as HeadersInit;
 
 const { setUser } = useUserStore();
 const toast = useToast();
@@ -23,25 +23,23 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 	try {
 		isLoading.value = true;
 
-		await $fetch('/api/company', {
-			method: 'POST',
+		await $fetch("/api/company", {
+			method: "POST",
 			body: {
 				...event.data,
-				userId: data.value?.user?.id || '',
+				userId: data.value?.user?.id || "",
 			},
 		});
 		await setUser(headers);
 		toast.add({
-			title: 'Компания успешно создана!',
-			id: 'modal-success',
-			color: 'orange',
+			title: "Компания успешно создана!",
+			id: "modal-success",
+			color: "orange",
 		});
-		location.reload()
-	}
-	catch (e) {
-		console.warn('StartSession/ onSave: ', e);
-	}
-	finally {
+		location.reload();
+	} catch (e) {
+		console.warn("StartSession/ onSave: ", e);
+	} finally {
 		isLoading.value = false;
 		isOpen.value = false;
 	}
@@ -86,15 +84,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 					class="space-y-4"
 					@submit="onSubmit"
 				>
-					<UFormGroup
-						label="Название"
-						name="name"
-					>
-						<UInput
-							v-model="state.name"
-							color="orange"
-							size="lg"
-						/>
+					<UFormGroup label="Название" name="name">
+						<UInput v-model="state.name" color="orange" size="lg" />
 					</UFormGroup>
 
 					<div class="grid grid-cols-2 gap-2">

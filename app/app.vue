@@ -1,11 +1,11 @@
 <template>
-	<div>
+	<UApp>
 		<NuxtLoadingIndicator />
 
-		<UApp>
+		<UMain>
 			<NuxtLayout>
 				<NuxtPage />
 			</NuxtLayout>
-		</UApp>
-	</div>
+		</UMain>
+	</UApp>
 </template>

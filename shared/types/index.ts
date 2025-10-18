@@ -1,4 +1,4 @@
-export type SortType = 'asc' | 'desc';
+export type SortType = "asc" | "desc";
 
 export type SpecType = {
 	label: string | number;

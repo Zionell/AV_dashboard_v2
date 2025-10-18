@@ -1,14 +1,20 @@
-import headConfig from "./config/head.config";
+import { headConfig } from "./config/head.config";
 
 interface IEnv {
 	SITE_URL: string;
 	JWT_SALT: string;
+	GOOGLE_CLIENT_ID: string;
+	GOOGLE_CLIENT_SECRET: string;
+	GOOGLE_REDIRECT_URI: string;
 	DEV: boolean;
 }
 
 const env: IEnv = {
 	SITE_URL: process.env.SITE_URL || "http://localhost:3000",
-	JWT_SALT: process.env.NUXT_JWT_SALT || "",
+	JWT_SALT: process.env.JWT_SALT || "",
+	GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
+	GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || "",
+	GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || "",
 	DEV: process.env.NODE_ENV === "development",
 };
 
@@ -37,19 +43,15 @@ export default defineNuxtConfig({
 		"@nuxtjs/robots",
 	],
 
+	components: [
+		{
+			path: "~/components",
+			pathPrefix: false,
+		},
+	],
 	// Env
 	runtimeConfig: {
 		...env,
-		public: {
-			salt: env.JWT_SALT,
-		},
-		googleAuth: {
-			clientId: process.env.GOOGLE_CLIENT_ID,
-			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-		},
-		authJs: {
-			secret: process.env.AUTH_SECRET,
-		},
 	},
 
 	// Route rules
@@ -108,6 +110,7 @@ export default defineNuxtConfig({
 	css: ["~/assets/css/main.css"],
 
 	app: {
+		// @ts-expect-error
 		head: headConfig,
 		pageTransition: { name: "page", mode: "out-in" },
 	},

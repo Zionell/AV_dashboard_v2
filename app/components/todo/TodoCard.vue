@@ -1,9 +1,6 @@
-<script
-	setup
-	lang="ts"
->
-import TodoDetailCard from '~/components/todo/TodoDetailCard.vue';
-import type { ITodo, TodoEditSchema } from '~/types/todo';
+<script setup lang="ts">
+import TodoDetailCard from "~/components/todo/TodoDetailCard.vue";
+import type { ITodo, TodoEditSchema } from "~/types/todo";
 
 type PropsType = {
 	todo: ITodo;
@@ -13,7 +10,7 @@ const props = withDefaults(defineProps<PropsType>(), {
 	todo: () => ({}) as ITodo,
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(["refresh"]);
 
 const slideover = useSlideover();
 const toast = useToast();
@@ -23,8 +20,8 @@ const save = async (newVal: TodoEditSchema) => {
 	try {
 		isLoading.value = true;
 
-		await $fetch('/api/todo', {
-			method: 'PUT',
+		await $fetch("/api/todo", {
+			method: "PUT",
 			query: {
 				id: props.todo.id,
 			},
@@ -34,15 +31,13 @@ const save = async (newVal: TodoEditSchema) => {
 		});
 		toast.add({
 			title: `Задача успешно обновлена!`,
-			id: 'modal-success',
-			color: 'orange',
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('Todo card/ save: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("Todo card/ save: ", e);
+	} finally {
 		isLoading.value = false;
 	}
 };
@@ -51,23 +46,21 @@ const remove = async () => {
 	try {
 		isLoading.value = true;
 
-		await $fetch('/api/todo', {
-			method: 'DELETE',
+		await $fetch("/api/todo", {
+			method: "DELETE",
 			query: {
 				id: props.todo.id,
 			},
 		});
 		toast.add({
 			title: `Задача успешно удалена!`,
-			id: 'modal-success',
-			color: 'orange',
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('Todo card/ remove: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("Todo card/ remove: ", e);
+	} finally {
 		isLoading.value = false;
 	}
 };
@@ -75,8 +68,8 @@ const complete = async () => {
 	try {
 		isLoading.value = true;
 
-		await $fetch('/api/todo', {
-			method: 'PUT',
+		await $fetch("/api/todo", {
+			method: "PUT",
 			query: {
 				id: props.todo.id,
 			},
@@ -84,12 +77,10 @@ const complete = async () => {
 				isCompleted: true,
 			},
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('Todo card/ complete: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("Todo card/ complete: ", e);
+	} finally {
 		isLoading.value = false;
 	}
 };
@@ -137,7 +128,9 @@ const openDetail = () => {
 		<div class="grid gap-3">
 			<div class="flex flex-col gap-4">
 				<UFormGroup label="Исполнитель">
-					<div class="flex justify-between text-sm border border-orange-400 p-2 rounded-xl">
+					<div
+						class="flex justify-between text-sm border border-orange-400 p-2 rounded-xl"
+					>
 						<div class="grow">
 							{{ todo.executor.name }}
 						</div>
@@ -159,9 +152,7 @@ const openDetail = () => {
 				@click.prevent.stop="remove"
 			>
 				<template #trailing>
-					<svgo-delete
-						class="w-4 h-4"
-					/>
+					<svgo-delete class="w-4 h-4" />
 				</template>
 			</UButton>
 			<UButton

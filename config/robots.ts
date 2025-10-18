@@ -6,14 +6,12 @@ interface IRobots {
 }
 
 export default function getRobotsInfo(): IRobots {
-	const disallows = [
-		'*',
-	];
+	const disallows = ["*"];
 
-	const allow = ['/*.css', '/*.js', '/*.png', '/*.jpg'];
+	const allow = ["/*.css", "/*.js", "/*.png", "/*.jpg"];
 
-	const sitemap = 'https://dashboard.askarov.dev/sitemap.xml';
-	const host = 'dashboard.askarov.dev';
+	const sitemap = "https://dashboard.askarov.dev/sitemap.xml";
+	const host = "dashboard.askarov.dev";
 
 	return {
 		disallows,

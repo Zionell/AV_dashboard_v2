@@ -19,15 +19,12 @@ const isEmpty = computed(() => {
 });
 
 const userImage = (user: UserType) => {
-	return user?.image || '/images/avatar.png';
+	return user?.image || "/images/avatar.png";
 };
 </script>
 
 <template>
-	<BlockWrapper
-		title="Участники"
-		:is-empty="isEmpty"
-	>
+	<BlockWrapper title="Участники" :is-empty="isEmpty">
 		<div>
 			<div class="grid grid-cols-[2.5rem_3fr_1fr] gap-6 text-xs">
 				<p>Фото</p>

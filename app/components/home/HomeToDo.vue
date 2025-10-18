@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ITodo } from '~/types/todo';
-import ColoredLabel from '~/components/ColoredLabel.vue';
-import TodoDetailCard from '~/components/todo/TodoDetailCard.vue';
+import type { ITodo } from "~/types/todo";
+import ColoredLabel from "~/components/ColoredLabel.vue";
+import TodoDetailCard from "~/components/todo/TodoDetailCard.vue";
 
 const router = useRouter();
 
@@ -20,7 +20,7 @@ const isEmpty = computed(() => {
 });
 
 const goToTasks = () => {
-	router.push('/todo');
+	router.push("/todo");
 };
 
 const openDetail = (todo: ITodo) => {
@@ -33,10 +33,7 @@ const openDetail = (todo: ITodo) => {
 </script>
 
 <template>
-	<BlockWrapper
-		title="Список задач"
-		:is-empty="isEmpty"
-	>
+	<BlockWrapper title="Список задач" :is-empty="isEmpty">
 		<div>
 			<div class="grid grid-cols-[3fr_1fr] text-xs">
 				<p>Задача</p>
@@ -61,10 +58,7 @@ const openDetail = (todo: ITodo) => {
 				</li>
 			</ul>
 			<EmptyBlock v-if="isEmpty" />
-			<UButton
-				color="orange"
-				@click="goToTasks"
-			>
+			<UButton color="orange" @click="goToTasks">
 				Посмотреть все
 			</UButton>
 		</div>

@@ -1,22 +1,36 @@
-import * as jose from 'jose';
+import * as jose from "jose";
 
 export const copyToClipboard = (text: string) => {
-	const inp = document.createElement('input');
+	const inp = document.createElement("input");
 
 	inp.value = text;
 	document.body.appendChild(inp);
 	inp.select();
 
-	if (!document.execCommand('copy')) {
-		console.warn('Error/CopyLink');
+	if (!document.execCommand("copy")) {
+		console.warn("Error/CopyLink");
 	}
 	document.body.removeChild(inp);
 };
 
 export const createId = () => {
-	const S4 = () => (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
-	return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
-}
+	const S4 = () =>
+		(((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+	return (
+		S4() +
+		S4() +
+		"-" +
+		S4() +
+		"-" +
+		S4() +
+		"-" +
+		S4() +
+		"-" +
+		S4() +
+		S4() +
+		S4()
+	);
+};
 
 export const createSecret = () => {
 	const $config = useRuntimeConfig();
@@ -25,16 +39,15 @@ export const createSecret = () => {
 
 export const encrypt = async (payload: string): Promise<string> => {
 	try {
-		const alg = 'HS256';
+		const alg = "HS256";
 
 		return await new jose.SignJWT({ payload: payload })
 			.setProtectedHeader({ alg })
-			.setExpirationTime('1d')
+			.setExpirationTime("1d")
 			.sign(createSecret());
-	}
-	catch (e) {
-		console.warn('encrypt', e);
-		return 'error';
+	} catch (e) {
+		console.warn("encrypt", e);
+		return "error";
 	}
 };
 
@@ -42,8 +55,7 @@ export const getJWTPayload = async (jwt: string) => {
 	try {
 		const { payload } = await jose.jwtVerify(jwt, createSecret());
 		return payload;
-	}
-	catch (e) {
+	} catch (e) {
 		throw new Error(String(e));
 	}
 };

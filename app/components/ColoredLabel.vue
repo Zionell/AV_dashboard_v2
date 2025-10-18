@@ -1,17 +1,14 @@
-<script
-	setup
-	lang="ts"
->
-import { hexToRgb } from '~/utils/colors';
+<script setup lang="ts">
+import { hexToRgb } from "~/utils/colors";
 
 const props = defineProps({
 	bgColor: {
 		type: String,
-		default: '',
+		default: "",
 	},
 });
 
-const textColor = ref<string>('#000000');
+const textColor = ref<string>("#000000");
 
 const isDark = () => {
 	const rgb = hexToRgb(props.bgColor);
@@ -23,10 +20,9 @@ const isDark = () => {
 
 onMounted(() => {
 	if (isDark()) {
-		textColor.value = '#ffffff';
-	}
-	else {
-		textColor.value = '#000000';
+		textColor.value = "#ffffff";
+	} else {
+		textColor.value = "#000000";
 	}
 });
 </script>

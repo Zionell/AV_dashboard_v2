@@ -1,16 +1,16 @@
-import type { SpecType } from "~~/types";
+import type { SpecType } from "#shared/types";
 
 export const LOGIN_CONTENT = {
-	title: "Войти",
-	linkLabel: "Еще нет профиля?",
+	title: "Sign in",
+	linkLabel: " Don't have an account?",
 	linkValue: "/auth/registration",
-	linkText: "Зарегистрироваться",
+	linkText: "Sign up",
 };
 export const REGISTRATION_CONTENT = {
-	title: "Регистрация",
-	linkLabel: "Уже зарегистрированы?",
+	title: "Sign up",
+	linkLabel: "Already have an account?",
 	linkValue: "/auth/login",
-	linkText: "Войти",
+	linkText: "Sign in",
 };
 
 export const fullListMonth: SpecType[] = [

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { z } from 'zod';
-import type { FormSubmitEvent } from '@nuxt/ui/dist/runtime/types';
-import type { TodoStatus } from '@prisma/client';
-import { useUserStore } from '~/store/user';
-import type { ProjectSpec } from '~/types/projects';
-import type { UserSpecType } from '~/types/user';
-import { generateColorFromString } from '~/utils/colors';
+import { z } from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { TodoStatus } from "@prisma/client";
+import { useUserStore } from "~/store/user";
+import type { ProjectSpec } from "~/types/projects";
+import type { UserSpecType } from "~/types/user";
+import { generateColorFromString } from "~/utils/colors";
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(["refresh"]);
 const userStore = useUserStore();
 const toast = useToast();
 const schema = z.object({
@@ -43,15 +43,15 @@ const labels = computed({
 	set: async (label) => {
 		const promises = label;
 
-		if (!label?.id || typeof label === 'string') {
+		if (!label?.id || typeof label === "string") {
 			const newLabel = label?.label ?? label;
 			const newCategory = {
 				label: newLabel,
 				color: `#${generateColorFromString(String(newLabel))}`,
 			};
 
-			await $fetch('/api/todo/status', {
-				method: 'POST',
+			await $fetch("/api/todo/status", {
+				method: "POST",
 				body: newCategory,
 			});
 		}
@@ -63,7 +63,7 @@ const labels = computed({
 const onSearchProject = async (search: string) => {
 	loadingProject.value = true;
 
-	const res = await $fetch<ProjectSpec[]>('/api/projects/specs', {
+	const res = await $fetch<ProjectSpec[]>("/api/projects/specs", {
 		params: {
 			companyId: userStore.getCompanyId,
 			search,
@@ -77,7 +77,7 @@ const onSearchProject = async (search: string) => {
 const onSearchUser = async (search: string) => {
 	loadingUser.value = true;
 
-	const res = await $fetch<UserSpecType[]>('/api/users/specs', {
+	const res = await $fetch<UserSpecType[]>("/api/users/specs", {
 		params: {
 			companyId: userStore.getCompanyId,
 			search,
@@ -91,7 +91,7 @@ const onSearchUser = async (search: string) => {
 const onSearchStatus = async (search: string) => {
 	loadingStatus.value = true;
 
-	const res = await $fetch<TodoStatus[]>('/api/todo/status', {
+	const res = await $fetch<TodoStatus[]>("/api/todo/status", {
 		params: {
 			search,
 		},
@@ -106,8 +106,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 	try {
 		isLoading.value = true;
 
-		await $fetch('/api/todo', {
-			method: 'POST',
+		await $fetch("/api/todo", {
+			method: "POST",
 			body: {
 				...event.data,
 				projectId: event.data.projectId.id,
@@ -116,16 +116,14 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 			},
 		});
 		toast.add({
-			title: 'Задача успешно создана!',
-			id: 'modal-success',
-			color: 'orange',
+			title: "Задача успешно создана!",
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('TodoAddNew/ onSave: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("TodoAddNew/ onSave: ", e);
+	} finally {
 		isLoading.value = false;
 		isOpen.value = false;
 	}
@@ -170,30 +168,17 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 					class="space-y-4"
 					@submit="onSubmit"
 				>
-					<UFormGroup
-						label="Название"
-						name="name"
-					>
-						<UInput
-							v-model="state.name"
-							color="orange"
-							size="lg"
-						/>
+					<UFormGroup label="Название" name="name">
+						<UInput v-model="state.name" color="orange" size="lg" />
 					</UFormGroup>
-					<UFormGroup
-						label="Описание"
-						name="description"
-					>
+					<UFormGroup label="Описание" name="description">
 						<UTextarea
 							v-model="state.description"
 							color="orange"
 							size="lg"
 						/>
 					</UFormGroup>
-					<UFormGroup
-						label="Проект"
-						name="projectId"
-					>
+					<UFormGroup label="Проект" name="projectId">
 						<USelectMenu
 							v-model="state.projectId"
 							:loading="loadingProject"
@@ -207,10 +192,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 							size="lg"
 						/>
 					</UFormGroup>
-					<UFormGroup
-						label="Исполнитель"
-						name="executorId"
-					>
+					<UFormGroup label="Исполнитель" name="executorId">
 						<USelectMenu
 							v-model="state.executorId"
 							:loading="loadingUser"
@@ -224,10 +206,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 							size="lg"
 						/>
 					</UFormGroup>
-					<UFormGroup
-						label="Статус"
-						name="todoStatusId"
-					>
+					<UFormGroup label="Статус" name="todoStatusId">
 						<USelectMenu
 							v-model="labels"
 							:loading="loadingStatus"
@@ -252,9 +231,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 								<span class="flex-shrink-0">New label:</span>
 								<span
 									class="flex-shrink-0 w-2 h-2 mt-px rounded-full -mx-1"
-									:style="{ background: `#${generateColorFromString(option.label ?? option)}` }"
+									:style="{
+										background: `#${generateColorFromString(option.label ?? option)}`,
+									}"
 								/>
-								<span class="block truncate">{{ option.label ?? option }}</span>
+								<span class="block truncate">{{
+									option.label ?? option
+								}}</span>
 							</template>
 						</USelectMenu>
 					</UFormGroup>

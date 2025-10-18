@@ -42,32 +42,32 @@ defineProps({
 
 <style>
 .ClockSvg__path1 {
-    transform-origin: center;
-    animation: minArrow 480s infinite;
+	transform-origin: center;
+	animation: minArrow 480s infinite;
 }
 
 .ClockSvg__path2 {
-    transform-origin: center;
-    animation: secArrow 120s infinite;
+	transform-origin: center;
+	animation: secArrow 120s infinite;
 }
 
 @keyframes minArrow {
-    from {
-        transform: rotate(0);
-    }
+	from {
+		transform: rotate(0);
+	}
 
-    to {
-        transform: rotate(10turn);
-    }
+	to {
+		transform: rotate(10turn);
+	}
 }
 
 @keyframes secArrow {
-    from {
-        transform: rotate(0);
-    }
+	from {
+		transform: rotate(0);
+	}
 
-    to {
-        transform: rotate(10turn);
-    }
+	to {
+		transform: rotate(10turn);
+	}
 }
 </style>

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { z } from 'zod';
-import type { FormSubmitEvent } from '@nuxt/ui/dist/runtime/types';
-import type { MaterialCategory } from '@prisma/client';
-import { useUserStore } from '~/store/user';
-import { generateColorFromString } from '~/utils/colors';
+import { z } from "zod";
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import type { MaterialCategory } from "@prisma/client";
+import { useUserStore } from "~/store/user";
+import { generateColorFromString } from "~/utils/colors";
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(["refresh"]);
 const userStore = useUserStore();
 const toast = useToast();
 const schema = z.object({
@@ -31,15 +31,15 @@ const labels = computed({
 	set: async (label) => {
 		let newValue = label;
 
-		if (!label?.id || typeof label === 'string') {
+		if (!label?.id || typeof label === "string") {
 			const newLabel = label?.label ?? label;
 			const newCategory = {
 				label: newLabel,
 				color: `#${generateColorFromString(String(newLabel))}`,
 			};
 
-			const res = await $fetch('/api/materials/categories', {
-				method: 'POST',
+			const res = await $fetch("/api/materials/categories", {
+				method: "POST",
 				body: newCategory,
 			});
 
@@ -55,7 +55,7 @@ const labels = computed({
 const onSearch = async (search: string) => {
 	loading.value = true;
 
-	const res = await $fetch<MaterialCategory[]>('/api/materials/categories', {
+	const res = await $fetch<MaterialCategory[]>("/api/materials/categories", {
 		params: {
 			search,
 		},
@@ -68,8 +68,8 @@ const onSearch = async (search: string) => {
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 	try {
 		isLoading.value = true;
-		await $fetch('/api/materials', {
-			method: 'POST',
+		await $fetch("/api/materials", {
+			method: "POST",
 			body: {
 				...event.data,
 				categoryId: selected.value?.id,
@@ -77,16 +77,14 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 			},
 		});
 		toast.add({
-			title: 'Материал успешно добавлен!',
-			id: 'modal-success',
-			color: 'orange',
+			title: "Материал успешно добавлен!",
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('StartSession/ onSave: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("StartSession/ onSave: ", e);
+	} finally {
 		isLoading.value = false;
 		isOpen.value = false;
 		state.name = undefined;
@@ -134,20 +132,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 					class="space-y-4"
 					@submit="onSubmit"
 				>
-					<UFormGroup
-						label="Название"
-						name="name"
-					>
-						<UInput
-							v-model="state.name"
-							color="orange"
-							size="lg"
-						/>
+					<UFormGroup label="Название" name="name">
+						<UInput v-model="state.name" color="orange" size="lg" />
 					</UFormGroup>
-					<UFormGroup
-						label="Категория"
-						name="category"
-					>
+					<UFormGroup label="Категория" name="category">
 						<USelectMenu
 							v-model="labels"
 							:loading="loading"
@@ -172,26 +160,24 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 								<span class="flex-shrink-0">New label:</span>
 								<span
 									class="flex-shrink-0 w-2 h-2 mt-px rounded-full -mx-1"
-									:style="{ background: `#${generateColorFromString(option.label ?? option)}` }"
+									:style="{
+										background: `#${generateColorFromString(option.label ?? option)}`,
+									}"
 								/>
-								<span class="block truncate">{{ option.label ?? option }}</span>
+								<span class="block truncate">{{
+									option.label ?? option
+								}}</span>
 							</template>
 						</USelectMenu>
 					</UFormGroup>
-					<UFormGroup
-						label="Описание"
-						name="description"
-					>
+					<UFormGroup label="Описание" name="description">
 						<UTextarea
 							v-model="state.description"
 							color="orange"
 							size="lg"
 						/>
 					</UFormGroup>
-					<UFormGroup
-						label="Ссылка"
-						name="designUrl"
-					>
+					<UFormGroup label="Ссылка" name="designUrl">
 						<UInput
 							v-model="state.sourceLink"
 							color="orange"

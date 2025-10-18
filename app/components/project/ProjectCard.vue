@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useUserStore } from '~/store/user';
-import type { IProject } from '~/types/projects';
+import { useUserStore } from "~/store/user";
+import type { IProject } from "~/types/projects";
 
 type PropsType = {
 	project: IProject;
@@ -10,7 +10,7 @@ const props = withDefaults(defineProps<PropsType>(), {
 	project: () => ({}) as IProject,
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(["refresh"]);
 
 const userStore = useUserStore();
 const toast = useToast();
@@ -19,28 +19,28 @@ const isRemoving = ref<boolean>(false);
 
 const projectProgress = computed((): number => {
 	const allTodos = props.project.todo.length;
-	const completed = props.project.todo.filter(t => t.isCompleted).length;
+	const completed = props.project.todo.filter((t) => t.isCompleted).length;
 
 	const progress = (completed * 100) / allTodos;
 	return progress || 0;
 });
 const color = computed(() => {
-	if (projectProgress.value < 20) return 'red';
-	if (projectProgress.value < 60) return 'orange';
-	return 'green';
+	if (projectProgress.value < 20) return "red";
+	if (projectProgress.value < 60) return "orange";
+	return "green";
 });
 const isActive = computed(() => props.project.users[0].isCurrent);
-const users = computed(() => props.project.users.map(u => u.user));
+const users = computed(() => props.project.users.map((u) => u.user));
 const imageUrl = computed(() => {
-	return props.project.imgUrl || '/images/default-project.svg';
+	return props.project.imgUrl || "/images/default-project.svg";
 });
 
 const setCurrent = async () => {
 	try {
 		isLoading.value = true;
 
-		await $fetch('/api/projects/current', {
-			method: 'PUT',
+		await $fetch("/api/projects/current", {
+			method: "PUT",
 			query: {
 				id: props.project.id,
 				userId: userStore.getUserId,
@@ -48,15 +48,13 @@ const setCurrent = async () => {
 		});
 		toast.add({
 			title: `Проект ${props.project.name} успешно выбран!`,
-			id: 'modal-success',
-			color: 'orange',
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('Project card/ setCurrent: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("Project card/ setCurrent: ", e);
+	} finally {
 		isLoading.value = false;
 	}
 };
@@ -64,23 +62,21 @@ const remove = async () => {
 	try {
 		isRemoving.value = true;
 
-		await $fetch('/api/projects', {
-			method: 'DELETE',
+		await $fetch("/api/projects", {
+			method: "DELETE",
 			query: {
 				id: props.project.id,
 			},
 		});
 		toast.add({
 			title: `Проект ${props.project.name} успешно удален!`,
-			id: 'modal-success',
-			color: 'orange',
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('Project card/ remove: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("Project card/ remove: ", e);
+	} finally {
 		isRemoving.value = false;
 	}
 };
@@ -106,9 +102,7 @@ const remove = async () => {
 				<h3 class="text-xl">
 					{{ project.name }}
 				</h3>
-				<UBadge v-if="isActive">
-					Активный
-				</UBadge>
+				<UBadge v-if="isActive"> Активный </UBadge>
 			</div>
 		</template>
 
@@ -122,10 +116,7 @@ const remove = async () => {
 			/>
 			<div class="flex flex-col gap-4">
 				<UFormGroup label="Прогресс">
-					<UProgress
-						:value="projectProgress"
-						:color="color"
-					/>
+					<UProgress :value="projectProgress" :color="color" />
 				</UFormGroup>
 				<UFormGroup label="Участники">
 					<ul class="h-full custom__scroll">

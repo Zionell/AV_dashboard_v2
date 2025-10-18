@@ -1,9 +1,6 @@
-<script
-	setup
-	lang="ts"
->
-import { useUserStore } from '~/store/user';
-import type { ITodo, TodoEditSchema } from '~/types/todo';
+<script setup lang="ts">
+import { useUserStore } from "~/store/user";
+import type { ITodo, TodoEditSchema } from "~/types/todo";
 
 type PropsType = {
 	todo: ITodo;
@@ -31,8 +28,8 @@ const checkEditRights = computed(() => {
 	if (!userStore.user?.role || !props.isEditable) {
 		return true;
 	}
-	const role = userStore.user?.role
-	return !['MANAGER', 'OWNER'].includes(role);
+	const role = userStore.user?.role;
+	return !["MANAGER", "OWNER"].includes(role);
 });
 const isEdited = computed(() => {
 	return state.description !== props.todo.description;
@@ -85,7 +82,9 @@ const save = () => {
 						/>
 					</UFormGroup>
 					<UFormGroup label="Исполнитель">
-						<div class="flex justify-between text-sm border border-orange-400 p-2 rounded-xl">
+						<div
+							class="flex justify-between text-sm border border-orange-400 p-2 rounded-xl"
+						>
 							<div class="grow">
 								{{ todo.executor.name }}
 							</div>
@@ -107,9 +106,7 @@ const save = () => {
 					@click.prevent.stop="onRemove"
 				>
 					<template #trailing>
-						<svgo-delete
-							class="w-4 h-4"
-						/>
+						<svgo-delete class="w-4 h-4" />
 					</template>
 				</UButton>
 				<UButton

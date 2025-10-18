@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { TodoStatus } from '@prisma/client';
-import { DoughnutChart, useDoughnutChart } from 'vue-chart-3';
-import type { ChartData, ChartOptions } from 'chart.js';
+import type { TodoStatus } from "@prisma/client";
+import { DoughnutChart, useDoughnutChart } from "vue-chart-3";
+import type { ChartData, ChartOptions } from "chart.js";
 
 type TodoGroupType = {
 	todoStatusId: string;
@@ -48,7 +48,7 @@ const preparedData = computed<ChartDataType>(() => {
 	return data;
 });
 
-const chartData = computed<ChartData<'doughnut'>>(() => ({
+const chartData = computed<ChartData<"doughnut">>(() => ({
 	labels: preparedData.value.labels,
 	datasets: [
 		{
@@ -58,12 +58,12 @@ const chartData = computed<ChartData<'doughnut'>>(() => ({
 	],
 }));
 
-const options = computed<ChartOptions<'doughnut'>>(() => ({
+const options = computed<ChartOptions<"doughnut">>(() => ({
 	responsive: true,
 	maintainAspectRatio: false,
 	plugins: {
 		legend: {
-			position: 'top',
+			position: "top",
 			labels: {
 				usePointStyle: true,
 				padding: 50,
@@ -86,11 +86,7 @@ onMounted(() => {
 </script>
 
 <template>
-	<BlockWrapper
-		title="График"
-		:is-empty="isEmpty"
-		:is-loading="isLoading"
-	>
+	<BlockWrapper title="График" :is-empty="isEmpty" :is-loading="isLoading">
 		<DoughnutChart v-bind="doughnutChartProps" />
 	</BlockWrapper>
 </template>

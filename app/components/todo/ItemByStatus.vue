@@ -1,16 +1,13 @@
-<script
-	setup
-	lang="ts"
->
-import type { TodoStatus } from '@prisma/client';
-import type { ITodo } from '~/types/todo';
+<script setup lang="ts">
+import type { TodoStatus } from "@prisma/client";
+import type { ITodo } from "~/types/todo";
 
 type PropsType = {
 	todos: ITodo[];
 	status: TodoStatus[];
 };
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(["refresh"]);
 const props = withDefaults(defineProps<PropsType>(), {
 	todos: () => [],
 	status: () => [],
@@ -19,15 +16,15 @@ const props = withDefaults(defineProps<PropsType>(), {
 const isLoading = ref<boolean>(false);
 
 const filterTodo = (status: string) => {
-	return props.todos.filter(todo => todo.todoStatusId === status);
+	return props.todos.filter((todo) => todo.todoStatusId === status);
 };
 
 const onDragStart = (ev: DragEvent, todoId: string) => {
 	if (!ev?.dataTransfer) {
 		return;
 	}
-	ev.dataTransfer.dropEffect = 'move';
-	ev.dataTransfer.setData('todoId', todoId.toString());
+	ev.dataTransfer.dropEffect = "move";
+	ev.dataTransfer.setData("todoId", todoId.toString());
 };
 const onDrop = async (ev: DragEvent, statusId: string) => {
 	if (!ev?.dataTransfer) {
@@ -35,22 +32,20 @@ const onDrop = async (ev: DragEvent, statusId: string) => {
 	}
 
 	try {
-		const todoId = ev.dataTransfer.getData('todoId');
+		const todoId = ev.dataTransfer.getData("todoId");
 		isLoading.value = true;
 
-		await $fetch('/api/todo/status', {
-			method: 'PUT',
+		await $fetch("/api/todo/status", {
+			method: "PUT",
 			params: {
 				id: todoId,
 				statusId,
 			},
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('TodoChangeStatus/ onSave: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("TodoChangeStatus/ onSave: ", e);
+	} finally {
 		isLoading.value = false;
 	}
 };

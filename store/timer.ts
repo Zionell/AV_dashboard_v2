@@ -1,12 +1,12 @@
-import { defineStore } from 'pinia';
+import { defineStore } from "pinia";
 
-export const useTimerStore = defineStore('timer', {
+export const useTimerStore = defineStore("timer", {
 	state: () => ({
 		isStarted: false as boolean,
 	}),
 
 	getters: {
-		getIsStarted: state => state.isStarted,
+		getIsStarted: (state) => state.isStarted,
 	},
 
 	actions: {

@@ -14,19 +14,16 @@ const props = withDefaults(defineProps<PropsType>(), {
 });
 
 const onload = computed(() => {
-	return Math.ceil(props.progress.completed * 100 / props.progress.allTodos);
+	return Math.ceil(
+		(props.progress.completed * 100) / props.progress.allTodos,
+	);
 });
 </script>
 
 <template>
-	<BlockWrapper
-		title="Мой прогресс"
-		:is-empty="!progress.completed"
-	>
+	<BlockWrapper title="Мой прогресс" :is-empty="!progress.completed">
 		<div class="flex items-center justify-between gap-2.5">
-			<p class="text-2xl font-semibold">
-				{{ onload }}%
-			</p>
+			<p class="text-2xl font-semibold">{{ onload }}%</p>
 			<div
 				class="flex items-center justify-center p-3 rounded-2xl bg-orange-50"
 			>

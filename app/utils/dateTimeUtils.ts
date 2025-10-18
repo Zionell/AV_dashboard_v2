@@ -1,40 +1,40 @@
-import { leadingZero } from '~/utils/numberUtils';
+import { leadingZero } from "~/utils/numberUtils";
 
 type TimeParamsKey =
-	| '$d'
-	| '$j'
-	| '$D'
-	| '$l'
-	| '$m'
-	| '$n'
-	| '$M'
-	| '$b'
-	| '$F'
-	| '$E'
-	| '$e'
-	| '$y'
-	| '$g'
-	| '$G'
-	| '$h'
-	| '$H'
-	| '$i'
-	| '$I'
-	| '$s'
-	| '$S'
-	| '$w';
+	| "$d"
+	| "$j"
+	| "$D"
+	| "$l"
+	| "$m"
+	| "$n"
+	| "$M"
+	| "$b"
+	| "$F"
+	| "$E"
+	| "$e"
+	| "$y"
+	| "$g"
+	| "$G"
+	| "$h"
+	| "$H"
+	| "$i"
+	| "$I"
+	| "$s"
+	| "$S"
+	| "$w";
 
 export const dayByIndex = (index: number, short?: boolean): string => {
 	const fullList: string[] = [
-		'Понедельник',
-		'Вторник',
-		'Среда',
-		'Четверг',
-		'Пятница',
-		'Суббота',
-		'Воскресение',
+		"Понедельник",
+		"Вторник",
+		"Среда",
+		"Четверг",
+		"Пятница",
+		"Суббота",
+		"Воскресение",
 	];
 
-	const shortList: string[] = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+	const shortList: string[] = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
 
 	return short ? shortList[index] : fullList[index];
 };
@@ -45,48 +45,48 @@ export const monthByIndex = (
 	plural?: boolean,
 ): string => {
 	const fullList: string[] = [
-		'Январь',
-		'Февраль',
-		'Март',
-		'Апрель',
-		'Май',
-		'Июнь',
-		'Июль',
-		'Август',
-		'Сентябрь',
-		'Октябрь',
-		'Ноябрь',
-		'Декабрь',
+		"Январь",
+		"Февраль",
+		"Март",
+		"Апрель",
+		"Май",
+		"Июнь",
+		"Июль",
+		"Август",
+		"Сентябрь",
+		"Октябрь",
+		"Ноябрь",
+		"Декабрь",
 	];
 
 	const pluralList: string[] = [
-		'Января',
-		'Февраля',
-		'Марта',
-		'Апреля',
-		'Мая',
-		'Июня',
-		'Июля',
-		'Августа',
-		'Сентября',
-		'Октября',
-		'Ноября',
-		'Декабря',
+		"Января",
+		"Февраля",
+		"Марта",
+		"Апреля",
+		"Мая",
+		"Июня",
+		"Июля",
+		"Августа",
+		"Сентября",
+		"Октября",
+		"Ноября",
+		"Декабря",
 	];
 
 	const shortList: string[] = [
-		'Янв',
-		'Фев',
-		'Мар',
-		'Апр',
-		'Май',
-		'Июн',
-		'Июл',
-		'Авг',
-		'Сен',
-		'Окт',
-		'Ноя',
-		'Дек',
+		"Янв",
+		"Фев",
+		"Мар",
+		"Апр",
+		"Май",
+		"Июн",
+		"Июл",
+		"Авг",
+		"Сен",
+		"Окт",
+		"Ноя",
+		"Дек",
 	];
 
 	if (short) {
@@ -102,7 +102,7 @@ export const isValidDate = (date: string) => !isNaN(Date.parse(date));
 
 export const formatDateTime = (date: string, pattern: string): string => {
 	if (!date) {
-		return '';
+		return "";
 	}
 
 	const d: Date = isValidDate(date) ? new Date(date) : new Date();
@@ -165,7 +165,7 @@ function getTimeSymbol(d: Date, key: TimeParamsKey): string | number {
 export function isPassed(date: Date): boolean {
 	let today = new Date();
 	today = new Date(
-        `${today.getMonth() + 1}.${today.getDate()}.${today.getFullYear()}`,
+		`${today.getMonth() + 1}.${today.getDate()}.${today.getFullYear()}`,
 	);
 	return date.getTime() < today.getTime();
 }

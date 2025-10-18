@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { UserMeType } from "../types/store/user";
+import type { UserMeType } from "#shared/types/user";
 
 interface IState {
 	user: UserMeType | null;
@@ -10,14 +10,12 @@ export const useUserStore = defineStore("user", () => {
 		user: null,
 	});
 
-	async function fetchUser(headers: Readonly<Record<string, string>>) {
+	async function fetchUser() {
 		try {
-			const { data: user } = await useFetch<UserMeType>("/api/users/me", {
-				headers,
-			});
+			const user = await $fetch<UserMeType>("/api/users/me");
 
-			if (user.value) {
-				state.user = { ...user.value };
+			if (user) {
+				state.user = { ...user };
 			}
 		} catch (e) {
 			console.warn("User store / setUser: ", e);

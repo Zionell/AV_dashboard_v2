@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Material, MaterialCategory } from '@prisma/client';
+import type { Material, MaterialCategory } from "@prisma/client";
 
 interface IMaterial extends Material {
 	category: MaterialCategory;
@@ -13,7 +13,7 @@ const props = withDefaults(defineProps<PropsType>(), {
 	item: () => ({}) as IMaterial,
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(["refresh"]);
 
 const toast = useToast();
 const isRemoving = ref<boolean>(false);
@@ -22,28 +22,26 @@ const remove = async () => {
 	try {
 		isRemoving.value = true;
 
-		await $fetch('/api/materials', {
-			method: 'DELETE',
+		await $fetch("/api/materials", {
+			method: "DELETE",
 			query: {
 				id: props.item.id,
 			},
 		});
 		toast.add({
 			title: `Материал ${props.item.name} успешно удален!`,
-			id: 'modal-success',
-			color: 'orange',
+			id: "modal-success",
+			color: "orange",
 		});
-		emit('refresh');
-	}
-	catch (e) {
-		console.warn('Material card/ remove: ', e);
-	}
-	finally {
+		emit("refresh");
+	} catch (e) {
+		console.warn("Material card/ remove: ", e);
+	} finally {
 		isRemoving.value = false;
 	}
 };
 const open = () => {
-	window.open(props.item.sourceLink, '_blank');
+	window.open(props.item.sourceLink, "_blank");
 };
 </script>
 
@@ -77,10 +75,7 @@ const open = () => {
 			</div>
 		</template>
 
-		<div
-			v-if="item.description"
-			class=""
-		>
+		<div v-if="item.description" class="">
 			<p>Описание:</p>
 			{{ item.description }}
 		</div>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Project } from '@prisma/client';
+import type { Project } from "@prisma/client";
 
 type PropsType = {
 	currentProject?: Project | null;
@@ -13,15 +13,9 @@ const isEmpty = computed(() => !props.currentProject?.id);
 </script>
 
 <template>
-	<BlockWrapper
-		title="Текущий проект"
-		:is-empty="isEmpty"
-	>
+	<BlockWrapper title="Текущий проект" :is-empty="isEmpty">
 		<div class="flex items-center justify-between gap-2.5">
-			<h3
-				v-if="currentProject?.name"
-				class="font-medium text-2xl"
-			>
+			<h3 v-if="currentProject?.name" class="font-medium text-2xl">
 				{{ currentProject.name }}
 			</h3>
 			<div
