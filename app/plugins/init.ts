@@ -1,11 +1,9 @@
-import { defineNuxtPlugin } from "nuxt/app";
+import { useUserStore } from "~~/store/user";
 
-export default defineNuxtPlugin(async (): Promise<void> => {
-	try {
-		// const headers = useRequestHeaders();
-		// const userStore = useUserStore();
-		// await Promise.all([userStore.setUser(headers)]);
-	} catch (e) {
-		console.warn(e);
+export default defineNuxtPlugin(async () => {
+	const userStore = useUserStore();
+
+	if (!userStore.user) {
+		await userStore.fetchUser();
 	}
 });

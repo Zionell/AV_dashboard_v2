@@ -50,34 +50,34 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
 
 <template>
 	<UDashboardPanel id="auth">
-	<section
-		class="grid grid-cols-[2fr_1.5fr] place-items-center gap-16 min-h-screen p-12"
-	>
-		<NuxtImg
-			class="h-full object-contain"
-			src="/images/auth-image.png"
-			placeholder
-			alt="Picture"
-			loading="lazy"
-		/>
+		<section
+			class="grid grid-cols-[2fr_1.5fr] place-items-center gap-16 min-h-screen p-12"
+		>
+			<NuxtImg
+				class="h-full object-contain"
+				src="/images/auth-image.png"
+				placeholder
+				alt="Picture"
+				loading="lazy"
+			/>
 
-		<UPageCard class="w-full max-w-md">
-			<UAuthForm
-				:schema="schema"
-				:title="LOGIN_CONTENT.title"
-				icon="i-lucide-user"
-				:fields="fields"
-				:providers="providers"
-				@submit="onSubmit"
-			>
-				<template #footer>
-					{{ LOGIN_CONTENT.linkLabel }}
-					<ULink as="button" class="text-primary font-medium">
-						{{ LOGIN_CONTENT.linkText }}
-					</ULink>
-				</template>
-			</UAuthForm>
-		</UPageCard>
-	</section>
+			<UPageCard class="w-full max-w-md">
+				<UAuthForm
+					:schema="schema"
+					:title="LOGIN_CONTENT.title"
+					icon="i-lucide-user"
+					:fields="fields"
+					:providers="providers"
+					@submit="onSubmit"
+				>
+					<template #footer>
+						{{ LOGIN_CONTENT.linkLabel }}
+						<ULink as="button" class="text-primary font-medium">
+							{{ LOGIN_CONTENT.linkText }}
+						</ULink>
+					</template>
+				</UAuthForm>
+			</UPageCard>
+		</section>
 	</UDashboardPanel>
 </template>

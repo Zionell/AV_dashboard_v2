@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NuxtError } from "nuxt/app";
+import type { NuxtError } from "#app";
 import { ERROR_MESSAGES } from "~/assets/ts/errors";
 
 const props = defineProps<{
@@ -14,7 +14,14 @@ const textError = computed<string>(() =>
 		: "Техническая ошибка",
 );
 
-const handleError = () => clearError({ redirect: "/" });
+useSeoMeta({
+	title: `Ошибка - ${status.value}`,
+	description: textError.value,
+});
+
+function handleError() {
+	clearError({ redirect: "/" });
+}
 </script>
 
 <template>

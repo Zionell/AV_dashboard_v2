@@ -4,5 +4,5 @@ export default defineEventHandler((event) => {
 		path: "/",
 	});
 
-	return sendRedirect(event, "/");
+	return true;
 });

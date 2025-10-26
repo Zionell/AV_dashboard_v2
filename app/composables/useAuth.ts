@@ -16,6 +16,7 @@ export default function useAuth() {
 	async function signOut() {
 		try {
 			await $fetch("/api/auth/logout");
+			window.location.href = ERoutes.INDEX;
 		} catch (e) {
 			console.error("useAuth / signOut: ", e);
 		}
