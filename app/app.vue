@@ -1,11 +1,11 @@
-<template>
-	<UApp>
-		<NuxtLoadingIndicator />
+<script setup lang="ts"></script>
 
-		<UMain>
-			<NuxtLayout>
-				<NuxtPage />
-			</NuxtLayout>
-		</UMain>
-	</UApp>
+<template>
+    <UApp>
+        <NuxtLoadingIndicator color="#4a89dc" />
+
+        <NuxtLayout>
+            <NuxtPage />
+        </NuxtLayout>
+    </UApp>
 </template>

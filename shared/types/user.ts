@@ -1,24 +1,22 @@
-export type UserMeType = {
-	id: string;
-	name: string | null;
-	email: string;
-	image: string | null;
-	role: string;
-	companyId?: string | null | undefined;
-};
+export enum EUserRole {
+    OWNER = 'OWNER',
+    MANAGER = 'MANAGER',
+    EMPLOYEE = 'EMPLOYEE',
+}
 
-export type UserShortType = {
-	id: string;
-	name: string | null;
-	role: string;
-};
+export interface IUserSpec {
+    id: string;
+    name: string | null;
+}
 
-export type UserSpecType = {
-	id: string;
-	name: string | null;
-};
+export interface IUserShort extends IUserSpec {
+    email: string;
+    image: string | null;
+    role: EUserRole;
+}
 
-export type UserItemType = {
-	isCurrent: boolean;
-	user: UserShortType;
-};
+export interface IUserMe extends IUserShort {
+    companyId: string | null;
+    bio: string | null;
+    hasPassword: boolean;
+}

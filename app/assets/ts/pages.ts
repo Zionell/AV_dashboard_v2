@@ -1,54 +1,54 @@
 export const PAGES = {
-	dashboard: {
-		link: "/dashboard",
-		value: "dashboard",
-		label: "Главная",
-	},
-	company: {
-		link: "/company",
-		value: "company",
-		label: "Компания",
-	},
-	projects: {
-		link: "/projects",
-		value: "projects",
-		label: "Проекты",
-	},
-	timesheet: {
-		link: "/timesheet",
-		value: "timesheet",
-		label: "Активность",
-	},
-	todo: {
-		link: "/todo",
-		value: "todo",
-		label: "Список задач",
-	},
-	materials: {
-		link: "/materials",
-		value: "materials",
-		label: "Материалы",
-	},
-	settings: {
-		link: "/settings/account",
-		value: "settings",
-		label: "Настройки",
-		subLinks: {
-			account: {
-				link: "/settings/account",
-				value: "account",
-				label: "Аккаунт",
-			},
-			password: {
-				link: "/settings/password",
-				value: "password",
-				label: "Пароль",
-			},
-			theme: {
-				link: "/settings/theme",
-				value: "theme",
-				label: "Настройка темы",
-			},
-		},
-	},
+    dashboard: {
+        label: 'Dashboard',
+        icon: 'i-lucide-house',
+        to: ERoutes.DASHBOARD,
+    },
+    company: {
+        label: 'Company',
+        icon: 'i-lucide-briefcase-conveyor-belt',
+        to: ERoutes.COMPANY,
+    },
+    projects: {
+        label: 'Projects',
+        icon: 'i-lucide-folder-open',
+        to: ERoutes.PROJECTS,
+    },
+    times: {
+        label: 'Times',
+        icon: 'i-lucide-clock',
+        to: ERoutes.TIMES,
+    },
+    tasks: {
+        label: 'Tasks',
+        icon: 'i-lucide-clipboard-list',
+        to: ERoutes.TASKS,
+    },
+    materials: {
+        label: 'Materials',
+        icon: 'i-lucide-book-open-text',
+        to: ERoutes.MATERIALS,
+    },
+    settings: {
+        label: 'Settings',
+        to: ERoutes.SETTINGS,
+        icon: 'i-lucide-settings',
+        defaultOpen: true,
+        type: 'trigger',
+        children: [
+            {
+                label: 'General',
+                to: ERoutes.SETTINGS,
+                exact: true,
+            },
+            // {
+            //     label: 'Notifications',
+            //     to: ERoutes.NOTIFICATIONS,
+            // },
+            {
+                label: 'Security',
+                to: ERoutes.SECURITY,
+            },
+        ],
+    },
 };

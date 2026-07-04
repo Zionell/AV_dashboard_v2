@@ -1,211 +1,159 @@
 <script setup lang="ts">
-import { z } from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
-import { useUserStore } from "~/store/user";
-import type { UserShortType } from "~/types/user";
-import { createId } from "~/utils/utils";
-import { put } from "@vercel/blob";
+import { z } from 'zod';
+import { toBase64 } from '~/assets/ts/files';
 
-const runtimeConfig = useRuntimeConfig();
-const emit = defineEmits(["refresh"]);
+const emit = defineEmits(['refresh']);
+
+defineExpose({
+    open: () => {
+        isOpen.value = true;
+    },
+});
+
+const { $csrfFetch } = useNuxtApp();
 const userStore = useUserStore();
 const toast = useToast();
+const isLoading = ref(false);
+const isOpen = ref<boolean>(false);
+const image = ref(null);
+
 const schema = z.object({
-	name: z.string(),
-	designUrl: z.string().optional(),
-	gitHub: z.string().optional(),
-	projectUrl: z.string().optional(),
+    name: z.string(),
+    users: z.array(z.string()).optional(),
 });
 
 type Schema = z.output<typeof schema>;
-const state = reactive({
-	name: undefined,
-	designUrl: undefined,
-	gitHub: undefined,
-	projectUrl: undefined,
+
+const state = reactive<Partial<Schema>>({
+    name: undefined,
+    users: [],
 });
 
-const files = ref(null);
-const selected = ref<UserShortType[] | []>([]);
-const loading = ref(false);
+const { data: users, status } = await useLazyFetch('/api/users/projects', {
+    query: {
+        companyId: userStore.user?.companyId,
+    },
+    key: 'users',
+});
 
-const selectLabel = computed(() => selected.value.map((s) => s.name));
+async function onSubmit() {
+    try {
+        isLoading.value = true;
 
-const onSearch = async (search: string) => {
-	loading.value = true;
+        const imageBase64 = image.value ? await toBase64(image.value!) : '';
 
-	const res = await $fetch<UserShortType[]>("/api/users/search", {
-		params: {
-			companyId: userStore.getCompanyId,
-			search,
-		},
-	});
+        await $csrfFetch('/api/projects', {
+            method: 'POST',
+            body: {
+                ...state,
+                image: imageBase64,
+                companyId: userStore.user?.companyId,
+            },
+        });
 
-	loading.value = false;
-
-	return res;
-};
-const isLoading = ref<boolean>(false);
-const isOpen = ref<boolean>(false);
-const handleFileInput = (evt: InputEvent) => {
-	const file = evt.target?.files[0];
-	if (file) {
-		files.value = file;
-	}
-};
-const onSubmit = async (event: FormSubmitEvent<Schema>) => {
-	try {
-		isLoading.value = true;
-		const users = selected.value.map((s) => s.id) || [];
-		let imgUrl = "";
-		if (files.value) {
-			const fileName = files.value?.name ?? createId();
-
-			const { url } = await put(`projects/${fileName}`, files.value, {
-				access: "public",
-				token: runtimeConfig.public.blob,
-			});
-			imgUrl = url;
-		}
-		await $fetch("/api/projects", {
-			method: "POST",
-			body: {
-				...event.data,
-				imgUrl,
-				users: users,
-				companyId: userStore.getCompanyId,
-			},
-		});
-		toast.add({
-			title: "Проект успешно создан!",
-			id: "modal-success",
-			color: "orange",
-		});
-		emit("refresh");
-	} catch (e) {
-		console.warn("ProjectAddNew/ onSave: ", e);
-	} finally {
-		isLoading.value = false;
-		isOpen.value = false;
-	}
-};
+        emit('refresh');
+        toast.add({
+            title: 'Success',
+            description: 'Your company have been created.',
+            icon: 'i-lucide-check',
+            color: 'success',
+        });
+    } catch (e) {
+        console.warn('ProjectAddNew/ onSubmit: ', e);
+    } finally {
+        isLoading.value = false;
+        isOpen.value = false;
+    }
+}
 </script>
 
 <template>
-	<div>
-		<UButton
-			label="Добавить проект"
-			size="lg"
-			color="orange"
-			@click="isOpen = true"
-		/>
+    <UModal
+        v-model:open="isOpen"
+        title="New project"
+    >
+        <UButton
+            label="Create project"
+            size="lg"
+            @click="isOpen = true"
+        />
 
-		<UModal v-model="isOpen">
-			<UCard
-				:ui="{
-					ring: '',
-					divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-				}"
-			>
-				<template #header>
-					<div class="flex items-center justify-between">
-						<h3
-							class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-						>
-							Новый проект
-						</h3>
-						<UButton
-							color="orange"
-							variant="ghost"
-							icon="i-heroicons-x-mark-20-solid"
-							@click="isOpen = false"
-						/>
-					</div>
-				</template>
+        <template #body>
+            <UForm
+                :schema="schema"
+                :state="state"
+                class="space-y-4"
+                @submit="onSubmit"
+            >
+                <UFormField
+                    name="name"
+                    label="Name"
+                    required
+                >
+                    <UInput
+                        v-model="state.name"
+                        autocomplete="off"
+                        class="w-full"
+                        size="lg"
+                    />
+                </UFormField>
+                <USeparator />
 
-				<UForm
-					:schema="schema"
-					:state="state"
-					class="space-y-4"
-					@submit="onSubmit"
-				>
-					<UFormGroup label="Название" name="name">
-						<UInput v-model="state.name" color="orange" size="lg" />
-					</UFormGroup>
-					<UFormGroup label="Название" name="users">
-						<USelectMenu
-							v-model="selected"
-							:loading="loading"
-							multiple
-							:searchable="onSearch"
-							searchable-placeholder="Участники"
-							:search-attributes="['name']"
-							clear-search-on-close
-							option-attribute="name"
-							by="id"
-							color="orange"
-							size="lg"
-						>
-							<template #label>
-								<span
-									v-if="selectLabel.length"
-									class="truncate"
-									>{{ selectLabel.join(", ") }}</span
-								>
-								<span v-else>Участники</span>
-							</template>
-						</USelectMenu>
-					</UFormGroup>
-					<UFormGroup label="Ссылка на макет" name="designUrl">
-						<UInput
-							v-model="state.designUrl"
-							color="orange"
-							size="lg"
-						/>
-					</UFormGroup>
-					<UFormGroup label="Ссылка на GitHUB" name="gitHub">
-						<UInput
-							v-model="state.gitHub"
-							color="orange"
-							size="lg"
-						/>
-					</UFormGroup>
-					<UFormGroup label="Ссылка на проект" name="gitHub">
-						<UInput
-							v-model="state.projectUrl"
-							color="orange"
-							size="lg"
-						/>
-					</UFormGroup>
-					<UFormGroup label="Превью проекта" name="image">
-						<UInput
-							color="orange"
-							size="lg"
-							type="file"
-							@input="handleFileInput"
-						/>
-					</UFormGroup>
+                <UFormField
+                    label="Participants"
+                    name="users"
+                >
+                    <USelectMenu
+                        v-model="state.users"
+                        :loading="status === 'pending'"
+                        :items="users"
+                        class="w-full"
+                        multiple
+                        virtualize
+                        value-key="id"
+                    >
+                        <template #item-label="{ item }">
+                            {{ item.name }}
 
-					<div class="grid grid-cols-2 gap-2">
-						<UButton
-							label="Отменить"
-							size="lg"
-							color="orange"
-							block
-							:loading="isLoading"
-							@click="isOpen = false"
-						/>
-						<UButton
-							label="Сохранить"
-							size="lg"
-							color="orange"
-							block
-							:loading="isLoading"
-							type="submit"
-						/>
-					</div>
-				</UForm>
-			</UCard>
-		</UModal>
-	</div>
+                            <span class="text-muted">
+                                {{ item.role }}
+                            </span>
+                        </template>
+                    </USelectMenu>
+                </UFormField>
+                <USeparator />
+
+                <UFormField
+                    name="image"
+                    label="Image"
+                >
+                    <UFileUpload
+                        v-model="image"
+                        icon="i-lucide-image"
+                        accept="image/*"
+                        label="Drop your image here"
+                        size="xl"
+                    />
+                </UFormField>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <UButton
+                        label="Cancel"
+                        size="lg"
+                        variant="outline"
+                        block
+                        :loading="isLoading"
+                        @click="isOpen = false"
+                    />
+                    <UButton
+                        label="Save"
+                        size="lg"
+                        block
+                        :loading="isLoading"
+                        type="submit"
+                    />
+                </div>
+            </UForm>
+        </template>
+    </UModal>
 </template>

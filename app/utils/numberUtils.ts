@@ -1,3 +1,3 @@
-export const leadingZero = (num: number): number | string => {
-	return num < 10 ? `0${num}` : num;
-};
+export function leadingZero(n: number) {
+    return String(n).padStart(2, '0');
+}

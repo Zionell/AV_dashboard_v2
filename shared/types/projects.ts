@@ -1,16 +1,11 @@
-import type { Project } from "@prisma/client";
-import { UserItemType } from "./user";
+import type { Project } from '~~/generated/prisma';
+import type { IUserShort } from '#shared/types/user';
 
-type ProjectTodoType = {
-	isCompleted: boolean;
-};
-
-export interface IProject extends Project {
-	users: UserItemType[];
-	todo: ProjectTodoType[];
+interface IProjectTodo {
+    isCompleted: boolean;
 }
 
-export type ProjectSpec = {
-	id: string;
-	name: string;
-};
+export interface IProject extends Project {
+    todo: IProjectTodo[];
+    users: IUserShort[];
+}

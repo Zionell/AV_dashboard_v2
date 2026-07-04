@@ -1,17 +1,22 @@
-import type { Todo, TodoStatus } from "@prisma/client";
-import { z } from "zod";
+import type { Todo, TodoStatus } from '@prisma/client';
+import { z } from 'zod';
+
+export interface ITodoProgress {
+    allTodos: number;
+    completed: number;
+}
 
 export interface ITodo extends Todo {
-	todoStatus: TodoStatus;
-	executor: {
-		name: string | null;
-		role: string;
-	};
+    todoStatus: TodoStatus;
+    executor: {
+        name: string | null;
+        role: string;
+    };
 }
 
 const todoEditSchema = z.object({
-	name: z.string(),
-	description: z.string().optional(),
+    name: z.string(),
+    description: z.string().optional(),
 });
 
 export type TodoEditSchema = z.output<typeof todoEditSchema>;
