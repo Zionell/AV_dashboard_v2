@@ -27,7 +27,10 @@ const description = computed(() => {
     return 'Set password for your account. This will be used to log in to your account.';
 });
 
-type PasswordSchema = z.infer<typeof fullPasswordSchema> | z.infer<typeof passwordSchema>;
+// Полная схема как тип состояния: current опционален через Partial и не рендерится,
+// когда пароль ещё не задан (в password кладём только new). Zod-схема для валидации
+// по-прежнему выбирается динамически ниже.
+type PasswordSchema = z.infer<typeof fullPasswordSchema>;
 
 const schema = computed(() => (hasPassword.value ? fullPasswordSchema : passwordSchema));
 const password = reactive<Partial<PasswordSchema>>(

@@ -2,64 +2,55 @@ import type { SpecType } from '#shared/types';
 
 export const LOGIN_CONTENT = {
     title: 'Sign in',
-    linkLabel: " Don't have an account?",
-    linkValue: '/auth/registration',
-    linkText: 'Sign up',
-};
-export const REGISTRATION_CONTENT = {
-    title: 'Sign up',
-    linkLabel: 'Already have an account?',
-    linkValue: '/auth/login',
-    linkText: 'Sign in',
 };
 
 export const fullListMonth: SpecType[] = [
     {
-        label: 'Январь',
+        label: 'January',
         value: 1,
     },
     {
-        label: 'Февраль',
+        label: 'February',
         value: 2,
     },
     {
-        label: 'Март',
+        label: 'March',
         value: 3,
     },
     {
-        label: 'Апрель',
+        label: 'April',
         value: 4,
     },
     {
-        label: 'Май',
+        label: 'May',
         value: 5,
     },
     {
-        label: 'Июнь',
+        label: 'June',
         value: 6,
     },
     {
-        label: 'Июль',
+        label: 'July',
         value: 7,
     },
     {
-        label: 'Август',
+        label: 'August',
         value: 8,
     },
     {
-        label: 'Сентябрь',
+        label: 'September',
         value: 9,
     },
     {
-        label: 'Октябрь',
+        label: 'October',
         value: 10,
     },
     {
-        label: 'Ноябрь',
+        label: 'November',
         value: 11,
     },
     {
-        label: 'Декабрь',
+        label: 'December',
         value: 12,
     },
 ];

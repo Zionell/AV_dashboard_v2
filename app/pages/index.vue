@@ -8,6 +8,15 @@ definePageMeta({
 });
 
 const { signIn } = useAuth();
+const { $csrfFetch } = useNuxtApp();
+const userStore = useUserStore();
+const route = useRoute();
+
+const isLoading = ref<boolean>(false);
+const errorMsg = ref<string>('');
+
+// Пришли по ссылке из письма-приглашения — примем его сразу после входа.
+const inviteToken = computed(() => route.query.token?.toString() || '');
 
 const fields: AuthFormField[] = [
     {
@@ -35,14 +44,42 @@ const providers: ButtonProps[] = [
 ];
 
 const schema = z.object({
-    email: z.string('Email is required').email('Invalid email'),
-    password: z.string('Password is required').min(8, 'Must be at least 8 characters'),
+    email: z.email('Invalid email'),
+    password: z.string('Password is required').min(6, 'Must be at least 6 characters'),
 });
 
 type Schema = z.output<typeof schema>;
 
-function onSubmit(payload: FormSubmitEvent<Schema>) {
-    console.log('Submitted', payload);
+async function onSubmit(payload: FormSubmitEvent<Schema>) {
+    try {
+        isLoading.value = true;
+        errorMsg.value = '';
+
+        const res = await $csrfFetch<{ onboarded: boolean }>('/api/auth/login', {
+            method: 'POST',
+            body: payload.data,
+        });
+
+        // С приглашением компания берётся из него — своя не создаётся, онбординг не нужен.
+        if (inviteToken.value && !res.onboarded) {
+            await $csrfFetch('/api/auth/accept-invite', {
+                method: 'POST',
+                body: { token: inviteToken.value },
+            });
+
+            await userStore.fetchUser();
+            await navigateTo(ERoutes.DASHBOARD);
+
+            return;
+        }
+
+        await userStore.fetchUser();
+        await navigateTo(res.onboarded ? ERoutes.DASHBOARD : ERoutes.LOGIN_NEW);
+    } catch (e) {
+        errorMsg.value = (e as { data?: { message?: string } })?.data?.message || 'Failed to sign in';
+    } finally {
+        isLoading.value = false;
+    }
 }
 </script>
 
@@ -64,16 +101,16 @@ function onSubmit(payload: FormSubmitEvent<Schema>) {
                     icon="i-lucide-user"
                     :fields="fields"
                     :providers="providers"
+                    :loading="isLoading"
                     @submit="onSubmit"
                 >
                     <template #footer>
-                        {{ LOGIN_CONTENT.linkLabel }}
-                        <ULink
-                            as="button"
-                            class="text-primary font-medium"
+                        <p
+                            v-if="errorMsg"
+                            class="text-sm text-error"
                         >
-                            {{ LOGIN_CONTENT.linkText }}
-                        </ULink>
+                            {{ errorMsg }}
+                        </p>
                     </template>
                 </UAuthForm>
             </UPageCard>

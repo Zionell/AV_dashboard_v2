@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { onMounted } from 'vue';
-import type { Times } from '~~/generated/prisma';
+import type { Times } from '~~/prisma/generated/prisma';
 
 const defaultTime = {
     hour: '00',
@@ -47,9 +47,9 @@ export const useTimesStore = defineStore('times', () => {
         }
     }
 
-    async function changeSessionStatus() {
+    async function changeSessionStatus(context?: { projectId?: string; todoId?: string }) {
         if (!isActive.value) {
-            await createActiveTimer();
+            await createActiveTimer(context);
         } else {
             await handleSave();
         }
@@ -58,13 +58,8 @@ export const useTimesStore = defineStore('times', () => {
     async function fetchActiveTimers() {
         try {
             const { $csrfFetch } = useNuxtApp();
-            const userStore = useUserStore();
 
-            const timers = await $csrfFetch('/api/times/active', {
-                params: {
-                    userId: userStore.user?.id,
-                },
-            });
+            const timers = await $csrfFetch('/api/times/active');
 
             if (timers?.length) {
                 activeTimers.value = timers;
@@ -76,16 +71,16 @@ export const useTimesStore = defineStore('times', () => {
         }
     }
 
-    async function createActiveTimer() {
+    async function createActiveTimer(context?: { projectId?: string; todoId?: string }) {
         try {
             isLoading.value = true;
             const { $csrfFetch } = useNuxtApp();
-            const userStore = useUserStore();
 
             const res = await $csrfFetch('/api/times', {
                 method: 'POST',
                 body: {
-                    userId: userStore.user?.id,
+                    projectId: context?.projectId || undefined,
+                    todoId: context?.todoId || undefined,
                 },
             });
 
@@ -107,15 +102,16 @@ export const useTimesStore = defineStore('times', () => {
             pause();
 
             const { $csrfFetch } = useNuxtApp();
-            const userStore = useUserStore();
 
             await $csrfFetch(`/api/times/${activeTime.value?.id}/`, {
                 method: 'PATCH',
-                body: {
-                    userId: userStore.user?.id,
-                },
+                body: {},
             });
 
+            // Без очистки следующая сессия попадёт в массив вторым элементом, а
+            // activeTime (это [0]) продолжит указывать на уже закрытую — и таймер
+            // будет считать от её начала.
+            activeTimers.value = [];
             time.value = JSON.parse(JSON.stringify(defaultTime));
         } catch (error) {
             console.error('useTimer / handleSave: ', error);
@@ -128,6 +124,7 @@ export const useTimesStore = defineStore('times', () => {
         isLoading,
         isActive,
         time,
+        activeTime,
         changeSessionStatus,
     };
 });

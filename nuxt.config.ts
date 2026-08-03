@@ -2,19 +2,11 @@ import { headConfig } from './config/head.config';
 
 interface IEnv {
     SITE_URL: string;
-    JWT_SALT: string;
-    GOOGLE_CLIENT_ID: string;
-    GOOGLE_CLIENT_SECRET: string;
-    GOOGLE_REDIRECT_URI: string;
     DEV: boolean;
 }
 
 const env: IEnv = {
     SITE_URL: process.env.SITE_URL || 'http://localhost:3000',
-    JWT_SALT: process.env.JWT_SALT || '',
-    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
-    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
-    GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI || '',
     DEV: process.env.NODE_ENV === 'development',
 };
 
@@ -26,21 +18,17 @@ const breakpoints = {
 };
 
 export default defineNuxtConfig({
-    compatibilityDate: '2025-07-15',
-
-    devtools: {
-        enabled: env.DEV,
-    },
-
     modules: [
         '@nuxt/ui',
         'nuxt-csurf',
         '@pinia/nuxt',
         '@vueuse/nuxt',
         'nuxt-security',
+        'nuxt-auth-utils',
         '@nuxt/image',
         '@nuxtjs/sitemap',
         '@nuxtjs/robots',
+        '@nuxt/eslint',
     ],
 
     components: [
@@ -50,6 +38,76 @@ export default defineNuxtConfig({
             global: true,
         },
     ],
+
+    devtools: {
+        enabled: env.DEV,
+    },
+
+    app: {
+        head: headConfig,
+    },
+
+    css: ['~/assets/css/main.css'],
+
+    // SEO
+    site: {
+        url: env.SITE_URL,
+    },
+
+    // Env
+    runtimeConfig: {
+        ...env,
+    },
+
+    // Route rules
+    routeRules: {
+        '/api/auth/**': {
+            security: {
+                rateLimiter: {
+                    tokensPerInterval: 10,
+                    interval: 60000,
+                },
+            },
+        },
+    },
+    compatibilityDate: '2025-07-15',
+
+    vite: {
+        optimizeDeps: {
+            include: [
+                '@nuxt/ui > prosemirror-state',
+                '@nuxt/ui > prosemirror-transform',
+                '@nuxt/ui > prosemirror-model',
+                '@nuxt/ui > prosemirror-view',
+                '@nuxt/ui > prosemirror-gapcursor',
+            ],
+        },
+    },
+
+    // Security
+    csurf: {
+        // CSRF выключаем только в интеграционных тестах: тест-клиент не воспроизводит
+        // парную куку/заголовок. Тесты идут против dev-сервера (nuxi _dev жёстко ставит
+        // NODE_ENV=development), поэтому ориентируемся на явный флаг из харнесса, а не на
+        // NODE_ENV. Флаг ставит только тестовый харнесс — в проде его нет.
+        enabled: !(process.env.NODE_ENV === 'test' || process.env.NUXT_DISABLE_CSRF === 'true'),
+        https: !env.DEV,
+        cookie: {
+            path: '/',
+            httpOnly: true,
+            sameSite: 'strict',
+        },
+        methodsToProtect: ['POST', 'PUT', 'PATCH'],
+        addCsrfTokenToEventCtx: true,
+        headerName: 'csrf-token',
+    },
+
+    // @nuxt/eslint — генерирует .nuxt/eslint.config.mjs; stylistic включает @stylistic-правила из eslint.config.mjs
+    eslint: {
+        config: {
+            stylistic: true,
+        },
+    },
 
     // @nuxt/icon
     icon: {
@@ -63,53 +121,11 @@ export default defineNuxtConfig({
         ],
     },
 
-    // Env
-    runtimeConfig: {
-        ...env,
-    },
-
-    // Route rules
-    routeRules: env.DEV
-        ? {}
-        : {
-              // Cached for 10 min
-              '/api/*': { cache: { maxAge: 60 * 10 } },
-          },
-
     // Nuxt images module
     image: {
         quality: 80,
         domains: [env.SITE_URL],
         screens: { ...breakpoints },
         format: ['webp'],
-    },
-
-    // Security
-    csurf: {
-        https: !env.DEV,
-        cookie: {
-            path: '/',
-            httpOnly: true,
-            sameSite: 'strict',
-        },
-        methodsToProtect: ['POST', 'PUT', 'PATCH'],
-        addCsrfTokenToEventCtx: true,
-        headerName: 'csrf-token',
-    },
-
-    security: {
-        // options
-    },
-
-    // SEO
-    site: {
-        url: env.SITE_URL,
-    },
-
-    css: ['~/assets/css/main.css'],
-
-    app: {
-        // @ts-expect-error
-        head: headConfig,
     },
 });

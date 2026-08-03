@@ -1,6 +1,6 @@
 generator client {
     provider = "prisma-client-js"
-    output   = "../generated/prisma"
+    output   = "./generated/prisma"
 }
 
 datasource db {
@@ -17,11 +17,20 @@ model User {
     hash        String?
     hasPassword Boolean @default(false)
     phone       String?
-    role        String  @default("USER")
+    role        String  @default("EMPLOYEE")
 
-    times    Times[]
-    executor Todo[]
-    projects UsersOnProjects[]
+    // Норма рабочего дня в часах — у каждого своя (задаётся при приглашении).
+    // Относительно неё считается переработка в times/stats и times/team.
+    workHours Int @default(8)
+
+    times           Times[]
+    executor        Todo[]
+    authoredTodos   Todo[]           @relation("TodoAuthor")
+    projects        UsersOnProjects[]
+    materials       Material[]
+    todoComments    TodoComment[]
+    todoAttachments TodoAttachment[]
+    events          Event[]
 
     companyId String?  @db.ObjectId
     company   Company? @relation(fields: [companyId], references: [id])
@@ -37,30 +46,105 @@ model Times {
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+    todoId String? @db.ObjectId
+    todo   Todo?   @relation(fields: [todoId], references: [id])
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
 model Company {
-    id        String     @id @default(auto()) @map("_id") @db.ObjectId
-    name      String
-    users     User[]
-    materials Material[]
-    projects  Project[]
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+
+    // Тариф: FREE | PRO | TEAM. Лимиты мест и хранилища — в COMPANY_PLANS
+    // (shared/types/company.ts), в БД держим только сам план.
+    plan String @default("FREE")
+
+    users              User[]
+    materials          Material[]
+    materialCategories MaterialCategory[]
+    projects           Project[]
+    attachments        TodoAttachment[]
+    invitations        Invitation[]
+}
+
+// Приглашение в компанию. Живёт до принятия или истечения — без него приглашённому
+// негде взять компанию и заданную пригласившим норму часов.
+model Invitation {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    email String
+    // Секрет из ссылки в письме. Уникален, чтобы принять приглашение можно было один раз.
+    token String @unique
+
+    // Норма рабочего дня, которую пригласивший задаёт приглашённому.
+    // При принятии копируется в User.workHours.
+    workHours Int @default(8)
+
+    companyId String  @db.ObjectId
+    company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+    invitedById String? @db.ObjectId
+
+    expiresAt  DateTime
+    acceptedAt DateTime?
+
+    createdAt DateTime @default(now())
+
+    @@index([companyId])
+    @@index([email])
 }
 
 model Project {
-    id    String  @id @default(auto()) @map("_id") @db.ObjectId
-    name  String
-    image String?
+    id          String  @id @default(auto()) @map("_id") @db.ObjectId
+    name        String
+    image       String?
+    description String?
+
+    client String?
+    // Числом, как и у задач: 3=HIGH, 2=MEDIUM, 1=LOW; null — без приоритета.
+    priority  Int?
+    startDate DateTime?
+    deadline  DateTime?
+    budget    Int?
+
+    links ProjectLink[]
 
     materials Material[]
 
     companyId String  @db.ObjectId
     company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-    users UsersOnProjects[]
-    todo  Todo[]
+    users  UsersOnProjects[]
+    todo   Todo[]
+    events Event[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+// Лента активности проекта.
+model Event {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    type String
+
+    projectId String  @db.ObjectId
+    project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+    actorId String? @db.ObjectId
+    actor   User?   @relation(fields: [actorId], references: [id])
+
+    // Имя задачи/материала на момент события — объект может быть удалён позже.
+    targetName String?
+    // Доп. данные, напр. { from: 'TODO', to: 'DONE' }
+    meta       Json?
+
+    createdAt DateTime @default(now())
+}
+
+type ProjectLink {
+    name String
+    url  String
 }
 
 model UsersOnProjects {
@@ -86,16 +170,62 @@ model Todo {
     executorId String @db.ObjectId
     executor   User   @relation(fields: [executorId], references: [id])
 
-    todoStatus   TodoStatus @relation(fields: [todoStatusId], references: [id])
-    todoStatusId String     @db.ObjectId
+    authorId String? @db.ObjectId
+    author   User?   @relation("TodoAuthor", fields: [authorId], references: [id])
+
+    status String @default("TODO")
+    // Числом, чтобы БД могла сортировать: 3=HIGH, 2=MEDIUM, 1=LOW; null — без приоритета.
+    // При сортировке desc null'ы уходят вниз (в BSON null < любого числа).
+    priority      Int?
+    dueDate       DateTime?
+    estimateHours Int?
+
+    times       Times[]
+    comments    TodoComment[]
+    attachments TodoAttachment[]
+
+    @@index([projectId, priority])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
-model TodoStatus {
-    id    String @id @default(auto()) @map("_id") @db.ObjectId
-    label String
-    color String
+model TodoComment {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    text String
 
-    todo Todo[]
+    todoId String @db.ObjectId
+    todo   Todo   @relation(fields: [todoId], references: [id], onDelete: Cascade)
+
+    authorId String @db.ObjectId
+    author   User   @relation(fields: [authorId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model TodoAttachment {
+    id   String @id @default(auto()) @map("_id") @db.ObjectId
+    name String
+    data String
+    // Размер декодированного файла в байтах — чтобы считать занятое место
+    // одним _sum, не читая сами base64-строки.
+    size Int
+
+    todoId String @db.ObjectId
+    todo   Todo   @relation(fields: [todoId], references: [id], onDelete: Cascade)
+
+    authorId String @db.ObjectId
+    author   User   @relation(fields: [authorId], references: [id])
+
+    // Денормализация: в Mongo нет джойнов, и без прямого companyId подсчёт квоты
+    // компании превращается в обход attachment → todo → project.
+    companyId String  @db.ObjectId
+    company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+    @@index([companyId])
+
+    createdAt DateTime @default(now())
 }
 
 model Material {
@@ -107,10 +237,16 @@ model Material {
     categoryId String           @db.ObjectId
     category   MaterialCategory @relation(fields: [categoryId], references: [id])
 
+    authorId String? @db.ObjectId
+    author   User?   @relation(fields: [authorId], references: [id])
+
     companyId String   @db.ObjectId
     company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-    Project   Project? @relation(fields: [projectId], references: [id])
+	project   Project? @relation(fields: [projectId], references: [id])
     projectId String?  @db.ObjectId
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model MaterialCategory {
@@ -118,5 +254,12 @@ model MaterialCategory {
     label String
     color String
 
+    // Справочник у каждой компании свой: без этого поля категории всех компаний
+    // видны всем и засоряются чужими.
+    companyId String  @db.ObjectId
+    company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
     material Material[]
+
+    @@index([companyId])
 }

@@ -1,8 +1,10 @@
 import { dbClient } from '~~/lib/dbClient';
+import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
     try {
-        const { companyId }: { companyId: string; userId: string } = getQuery(event);
+        requireRole(event, EUserRole.OWNER, EUserRole.MANAGER);
+        const companyId = requireCompanyId(event);
 
         return await dbClient.user.findMany({
             where: {
@@ -16,7 +18,7 @@ export default defineEventHandler(async (event) => {
             },
         });
     } catch (e) {
-        console.warn('User list/ get: ', e);
+        logger.warn('User list/ get: ', e);
         throw e;
     }
 });

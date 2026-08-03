@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { IMaterial } from '#shared/types/material';
-import type { MaterialCategory } from '@prisma/client';
 
 interface IProps {
     items: IMaterial[];
@@ -8,36 +7,17 @@ interface IProps {
 
 const props = defineProps<IProps>();
 
-const selected = ref<MaterialCategory[] | []>([]);
-const loading = ref(false);
+const { data: categories } = await useLazyFetch('/api/materials/categories', {
+    default: () => [],
+});
 
-const isEmpty = computed(() => !props.items.length);
-const filtered = computed(() =>
-    props.items.filter((item: IMaterial) => {
-        const keys = selected.value.map((s) => s.id);
+const categoryItems = computed(() => [
+    { label: 'All', value: undefined },
+    ...(categories.value || []).map((c) => ({ label: c.label, value: c.id })),
+]);
 
-        if (!keys.length) {
-            return item;
-        }
+const categoryId = defineModel<string | undefined>('categoryId');
 
-        return keys.includes(item.categoryId);
-    })
-);
-const selectLabel = computed(() => selected.value.map((s) => s.label));
-
-const onSearch = async (search: string) => {
-    loading.value = true;
-
-    const res = await $fetch<MaterialCategory[]>('/api/materials/categories', {
-        params: {
-            search,
-        },
-    });
-
-    loading.value = false;
-
-    return res;
-};
 const open = (link: string) => {
     window.open(link, '_blank');
 };
@@ -46,49 +26,28 @@ const open = (link: string) => {
 <template>
     <BlockWrapper
         title="Materials"
-        :is-empty="isEmpty"
+        :is-empty="!props.items.length"
     >
-        <div>
-            <USelectMenu
-                v-model="selected"
-                :loading="loading"
-                multiple
-                :searchable="onSearch"
-                searchable-placeholder="Введите название категории"
-                :search-attributes="['label']"
-                clear-search-on-close
-                option-attribute="label"
-                by="id"
-                color="orange"
-            >
-                <template #label>
-                    <span
-                        v-if="selectLabel.length"
-                        class="truncate"
-                        >{{ selectLabel.join(', ') }}</span
-                    >
-                    <span v-else>Категории</span>
-                </template>
-                <template #option="{ option: item }">
-                    <div
-                        class="h-5 w-5 rounded-full mr-4"
-                        :style="{ background: item.color }"
-                    />
-                    <span class="truncate">{{ item.label }}</span>
-                </template>
-            </USelectMenu>
+        <div class="p-4">
+            <USelect
+                v-model="categoryId"
+                :items="categoryItems"
+                placeholder="Type: All"
+                class="min-w-32"
+            />
+
             <ul
                 v-if="items.length"
                 class="h-56 mt-4 custom__scroll"
             >
                 <li
-                    v-for="material in filtered"
+                    v-for="material in props.items"
                     :key="material.id"
                     class="flex items-center justify-between rounded-xl gap-5 p-2 mb-4 border border-orange-300 hover:border-orange-700 ease-linear duration-150 cursor-pointer"
                     @click="open(material.sourceLink)"
                 >
                     <div class="w-5 h-5 rounded-full" />
-                    <div class="flex-grow">
+                    <div class="grow">
                         {{ material.name }}
                     </div>
                 </li>

@@ -1,23 +1,24 @@
-import { dbClient } from "~~/lib/dbClient";
+import { dbClient } from '~~/lib/dbClient';
+import { ETodoStatus } from '#shared/types/times';
 
 export default defineEventHandler(async (event) => {
-	try {
-		const { curProjectId }: { curProjectId: string } = getQuery(event);
+    try {
+        const items = await dbClient.todo.findMany({
+            where: {
+                project: projectScope(event),
+                status: ETodoStatus.IN_PROGRESS,
+            },
+            select: {
+                id: true,
+                name: true,
+                status: true,
+                projectId: true,
+            },
+        });
 
-		const items = await dbClient.todo.findMany({
-			where: {
-				projectId: curProjectId,
-			},
-			select: {
-				id: true,
-				name: true,
-				todoStatus: true,
-			},
-		});
-
-		return items || [];
-	} catch (e) {
-		console.warn("Todo spec/ get: ", e);
-		throw e;
-	}
+        return items || [];
+    } catch (e) {
+        logger.warn('Todo spec/ get: ', e);
+        throw e;
+    }
 });

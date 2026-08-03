@@ -1,23 +1,25 @@
-const exclude: string[] = [];
-
-export default defineNuxtRouteMiddleware(async (to, from) => {
-    const toPath: string = to.path;
-    const fromPath: string = from.fullPath;
+export default defineNuxtRouteMiddleware((to, from) => {
+    const userStore = useUserStore();
+    const user = userStore.user;
     const redirectUrl: string = from.query?.redirectUrl?.toString() || '';
 
-    const isExcluded = exclude.find((ex) => toPath.includes(ex));
-
-    if (isExcluded) {
+    if (!user) {
+        if (to.path !== ERoutes.INDEX) {
+            return navigateTo(`${ERoutes.INDEX}?redirectUrl=${to.fullPath}`);
+        }
         return;
     }
 
-    const userStore = useUserStore();
+    const onboarded = Boolean(user.companyId);
 
-    if (userStore.user && toPath === ERoutes.INDEX) {
-        return navigateTo(redirectUrl || ERoutes.DASHBOARD);
+    if (!onboarded) {
+        if (to.path !== ERoutes.LOGIN_NEW) {
+            return navigateTo(ERoutes.LOGIN_NEW);
+        }
+        return;
     }
 
-    if (!userStore.user && toPath !== ERoutes.INDEX) {
-        return navigateTo(`${ERoutes.INDEX}?redirectUrl=${fromPath}`);
+    if (to.path === ERoutes.INDEX || to.path === ERoutes.LOGIN_NEW) {
+        return navigateTo(redirectUrl || ERoutes.DASHBOARD);
     }
 });

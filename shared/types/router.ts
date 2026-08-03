@@ -1,5 +1,6 @@
 export enum ERoutes {
     INDEX = '/',
+    LOGIN_NEW = '/login/new',
     DASHBOARD = '/dashboard',
     COMPANY = '/company',
     PROJECTS = '/projects',

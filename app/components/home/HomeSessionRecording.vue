@@ -4,7 +4,7 @@ const timeStore = useTimesStore();
 
 <template>
     <BlockWrapper title="Session time">
-        <div class="flex items-center justify-between gap-2.5 mt-auto">
+        <div class="flex items-center justify-between gap-2.5 mt-auto p-4">
             <div class="font-medium text-3xl">
                 {{ timeStore.time.hour }}:{{ timeStore.time.min }}:{{ timeStore.time.sec }}
             </div>

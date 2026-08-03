@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { round1 } from '#shared/utils/format';
+
 interface IProps {
     project: IProject;
 }
@@ -9,8 +11,7 @@ const projectProgress = computed((): number => {
     const allTodos = props.project.todo.length;
     const completed = props.project.todo.filter((t) => t.isCompleted).length;
 
-    const progress = (completed * 100) / allTodos;
-    return progress || 0;
+    return allTodos ? round1((completed * 100) / allTodos) : 0;
 });
 const imageUrl = computed(() => props.project.image || '/images/default-project.svg');
 </script>

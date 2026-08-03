@@ -1,20 +1,24 @@
-import { dbClient } from "~~/lib/dbClient";
+import { dbClient } from '~~/lib/dbClient';
 
+// Справочник категорий своей компании. Без скоупа эндпоинт отдавал категории всех компаний.
 export default defineEventHandler(async (event) => {
-	try {
-		const { search }: { search: string } = getQuery(event);
+    try {
+        requireApiUser(event);
+        const companyId = requireCompanyId(event);
 
-		const categories = await dbClient.materialCategory.findMany({
-			where: {
-				label: {
-					contains: search,
-				},
-			},
-		});
+        const { search }: { search?: string } = getQuery(event);
 
-		return categories || [];
-	} catch (e) {
-		console.warn("MaterialCategory/ get: ", e);
-		throw e;
-	}
+        const categories = await dbClient.materialCategory.findMany({
+            where: {
+                companyId,
+                // Поиск без учёта регистра — как в остальных списках.
+                ...(search ? { label: { contains: search, mode: 'insensitive' as const } } : {}),
+            },
+        });
+
+        return categories || [];
+    } catch (e) {
+        logger.warn('MaterialCategory/ get: ', e);
+        throw e;
+    }
 });

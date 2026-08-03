@@ -1,64 +1,99 @@
-# Nuxt Dashboard Template
+# AV Dashboard
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+Multi-tenant team dashboard: projects, tasks (list + kanban), time tracking, knowledge base
+(materials), and per-company member management with role-based access.
 
-Get started with the Nuxt dashboard template with multiple pages, collapsible sidebar, keyboard shortcuts, light & dark more, command palette and more, powered by [Nuxt UI](https://ui.nuxt.com).
+## Stack
 
-- [Live demo](https://dashboard-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+- **[Nuxt 4](https://nuxt.com)** + **[Nuxt UI 4](https://ui.nuxt.com)** — app framework and UI kit
+- **[Pinia](https://pinia.vuejs.org)** — client state
+- **[Prisma 6](https://www.prisma.io)** + **MongoDB** — data layer
+- **[nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils)** — sessions (email + Google OAuth)
+- **[nuxt-csurf](https://github.com/Morgbn/nuxt-csurf)** + **[nuxt-security](https://nuxt-security.vercel.app)** — CSRF & hardening
+- **ESLint + Prettier + Husky** — linting, formatting, pre-commit hook
 
-<a href="https://dashboard-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/dashboard-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/dashboard-light.png">
-    <img alt="Nuxt Dashboard Template" src="https://ui.nuxt.com/assets/templates/nuxt/dashboard-light.png">
-  </picture>
-</a>
+## Requirements
 
-> The dashboard template for Vue is on https://github.com/nuxt-ui-templates/dashboard-vue.
-
-## Quick Start
-
-```bash [Terminal]
-npm create nuxt@latest -- -t github:nuxt-ui-templates/dashboard
-```
-
-## Deploy your own
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-name=dashboard&repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fdashboard&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fdashboard-dark.png&demo-url=https%3A%2F%2Fdashboard-template.nuxt.dev%2F&demo-title=Nuxt%20Dashboard%20Template&demo-description=A%20dashboard%20template%20with%20multi-column%20layout%20for%20building%20sophisticated%20admin%20interfaces.)
+- Node.js 20+
+- A MongoDB connection string (Atlas or a local replica set — Prisma requires a replica set for MongoDB)
 
 ## Setup
 
-Make sure to install the dependencies:
-
 ```bash
-pnpm install
+npm install
 ```
 
-## Development Server
+`postinstall` runs `nuxt prepare` (generates types and the ESLint flat config), and `prepare`
+installs the Husky git hooks.
 
-Start the development server on `http://localhost:3000`:
+### Environment
+
+Copy `.env.example` to `.env` and fill in the values:
+
+| Variable                                                    | Purpose                                                 |
+| ----------------------------------------------------------- | ------------------------------------------------------- |
+| `DATABASE_URL`                                              | MongoDB connection string                               |
+| `NUXT_SESSION_PASSWORD`                                     | Session encryption key (32+ chars)                      |
+| `SITE_URL`                                                  | Public base URL (used for links, sitemap)               |
+| `NUXT_OAUTH_GOOGLE_CLIENT_ID` / `_SECRET` / `_REDIRECT_URL` | Google OAuth (optional)                                 |
+| `SMTP_*`, `MAIL_FROM`                                       | Email for invitations — **currently mocked**, see below |
+
+### Database
+
+Push the Prisma schema to the database and generate the client:
 
 ```bash
-pnpm dev
+npm run db-push          # prisma db push
+npm run prisma:generate  # prisma generate
 ```
 
-## Production
-
-Build the application for production:
+## Development
 
 ```bash
-pnpm build
+npm run dev              # http://localhost:3000
 ```
 
-Locally preview production build:
+## Scripts
 
-```bash
-pnpm preview
+| Script                            | Description              |
+| --------------------------------- | ------------------------ |
+| `npm run dev`                     | Dev server               |
+| `npm run build` / `npm run start` | Production build / serve |
+| `npm run db-push` / `db-pull`     | Sync Prisma schema       |
+| `npm run prisma-studio`           | Prisma Studio            |
+| `npm run prettier`                | Format the whole repo    |
+
+Committing runs `lint-staged` (ESLint `--fix` + Prettier) on staged files via a Husky pre-commit hook.
+
+## Project structure
+
+```
+app/            # Nuxt app: pages, components, stores, composables
+  components/   # grouped by domain: tasks/, project/, materials/, company/, times/, common/
+  pages/        # routed pages (dashboard, projects, tasks, times, materials, company, login)
+server/
+  api/          # REST endpoints (grouped by resource)
+  middleware/   # auth: validates the session user on every /api/ request
+  utils/        # access.ts (RBAC + tenant scoping), events.ts, mailer.ts, logger.ts
+shared/         # types shared between client and server
+prisma/         # schema.prisma + generated client
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Access model (RBAC + tenancy)
 
-## Renovate integration
+Every user belongs to a company; all data is scoped to it. Roles: **OWNER**, **MANAGER**,
+**EMPLOYEE**. Access rules live in one place — `server/utils/access.ts`:
 
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+- `requireRole` / `hasRole` — role gates
+- `projectScope` — OWNER sees the whole company; MANAGER/EMPLOYEE only projects they belong to
+- `requireProjectMembership` / `requireTodoInScope` — object-level checks (return 404, not 403,
+  so foreign objects aren't revealed)
+
+Client mutations go through `$csrfFetch` (CSRF token attached automatically).
+
+## Notes
+
+- **Email is mocked.** `server/utils/mailer.ts` logs invitation emails to the server console.
+  To enable real delivery, fill in `SMTP_*` in `.env` and uncomment the `nodemailer` transport in
+  that file.
+- Task attachments and project/material images are stored as base64 in the database.

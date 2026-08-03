@@ -1,7 +1,8 @@
+import { startOfWeek } from 'date-fns';
 import { dbClient } from '~~/lib/dbClient';
+import { EUserRole } from '#shared/types/user';
 
 type QueryType = {
-    companyId: string;
     take: string;
     skip: string;
     order: SortType;
@@ -10,7 +11,9 @@ type QueryType = {
 
 export default defineEventHandler(async (event) => {
     try {
-        const { companyId, take = '15', skip = '0', order = 'desc', q }: QueryType = getQuery(event);
+        requireRole(event, EUserRole.OWNER, EUserRole.MANAGER);
+        const companyId = requireCompanyId(event);
+        const { take = '15', skip = '0', order = 'desc', q }: QueryType = getQuery(event);
 
         const users = await dbClient.user.findMany({
             take: Number(take),
@@ -26,7 +29,10 @@ export default defineEventHandler(async (event) => {
                 id: true,
                 name: true,
                 email: true,
+                image: true,
                 role: true,
+                createdAt: true,
+                updatedAt: true,
             },
             orderBy: {
                 name: order,
@@ -38,9 +44,31 @@ export default defineEventHandler(async (event) => {
             },
         });
 
-        return { results: users, count };
+        // Отработанное время за текущую неделю по пользователям страницы.
+        const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
+        const times = await dbClient.times.findMany({
+            where: {
+                userId: { in: users.map((u) => u.id) },
+                createdAt: { gte: weekStart },
+            },
+            select: { userId: true, createdAt: true, updatedAt: true, active: true },
+        });
+
+        const now = Date.now();
+        const timeWeekByUser: Record<string, number> = {};
+        for (const t of times) {
+            const end = t.active ? now : t.updatedAt.getTime();
+            timeWeekByUser[t.userId] = (timeWeekByUser[t.userId] || 0) + Math.max(0, end - t.createdAt.getTime());
+        }
+
+        const results = users.map((u) => ({
+            ...u,
+            timeWeekMs: timeWeekByUser[u.id] || 0,
+        }));
+
+        return { results, count };
     } catch (e) {
-        console.warn('User list/ get: ', e);
+        logger.warn('User list/ get: ', e);
         throw e;
     }
 });

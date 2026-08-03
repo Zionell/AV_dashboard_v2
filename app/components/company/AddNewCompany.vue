@@ -81,7 +81,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                         variant="outline"
                         block
                         :loading="isLoading"
-                        @click="isOpen = false"
+                        @click="void (isOpen = false)"
                     />
                     <UButton
                         label="Save"

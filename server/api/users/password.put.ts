@@ -1,40 +1,40 @@
 import bcrypt from 'bcryptjs';
+import { z } from 'zod';
 import { dbClient } from '~~/lib/dbClient';
+
+const bodySchema = z.object({
+    current: z.string().optional(),
+    new: z.string().min(6, 'Password must be at least 6 characters'),
+});
 
 export default defineEventHandler(async (event) => {
     try {
-        const body = await readBody(event);
+        const sessionUser = requireApiUser(event);
+        const body = await readValidatedBody(event, bodySchema.parse);
 
-        const { id, ...rest } = body;
+        const user = await dbClient.user.findUnique({
+            where: {
+                id: sessionUser.id,
+            },
+        });
 
-        if (!id) {
+        if (!user) {
             throw createError({ statusCode: 404, statusMessage: 'User not found' });
         }
 
-        if ('current' in rest) {
-            const user = await dbClient.user.findUnique({
-                where: {
-                    id: id,
-                },
-            });
-
-            if (!user) {
-                throw createError({ statusCode: 404, statusMessage: 'User not found' });
-            }
-            const hash = user.hash || '';
-
-            const isValid = await bcrypt.compare(rest.current, hash);
+        if (user.hasPassword && user.hash) {
+            const isValid = body.current ? await bcrypt.compare(body.current, user.hash) : false;
 
             if (!isValid) {
                 throw createError({ statusCode: 401, statusMessage: 'Invalid password' });
             }
         }
 
-        const newHash = await bcrypt.hash(rest.new, 10);
+        const newHash = await bcrypt.hash(body.new, 10);
 
         await dbClient.user.update({
             where: {
-                id: id,
+                id: user.id,
             },
             data: {
                 hash: newHash,
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
 
         return true;
     } catch (e) {
-        console.warn('User update password / put: ', e);
+        logger.warn('User update password / put: ', e);
         throw e;
     }
 });

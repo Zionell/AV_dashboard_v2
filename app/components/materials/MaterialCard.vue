@@ -1,101 +1,67 @@
 <script setup lang="ts">
-import type { Material, MaterialCategory } from '@prisma/client';
+import { formatDistanceToNow } from 'date-fns';
+import type { IMaterialCard } from '#shared/types/material';
+import { EViewType } from '#shared/types';
 
-interface IMaterial extends Material {
-    category: MaterialCategory;
+const props = defineProps<{
+    item: IMaterialCard;
+    view?: EViewType;
+}>();
+
+const updatedAgo = computed(() => formatDistanceToNow(new Date(props.item.updatedAt), { addSuffix: true }));
+
+function open() {
+    navigateTo(`${ERoutes.MATERIALS}/${props.item.id}`);
 }
-
-type PropsType = {
-    item: IMaterial;
-};
-
-const props = withDefaults(defineProps<PropsType>(), {
-    item: () => ({}) as IMaterial,
-});
-
-const emit = defineEmits(['refresh']);
-
-const toast = useToast();
-const isRemoving = ref<boolean>(false);
-
-const remove = async () => {
-    try {
-        isRemoving.value = true;
-
-        await $fetch('/api/materials', {
-            method: 'DELETE',
-            query: {
-                id: props.item.id,
-            },
-        });
-        toast.add({
-            title: `Материал ${props.item.name} успешно удален!`,
-            color: 'success',
-        });
-        emit('refresh');
-    } catch (e) {
-        console.warn('Material card/ remove: ', e);
-    } finally {
-        isRemoving.value = false;
-    }
-};
-const open = () => {
-    window.open(props.item.sourceLink, '_blank');
-};
 </script>
 
 <template>
-    <UCard
-        :ui="{
-            base: 'h-full flex flex-col',
-            ring: `ring-1 ring-gray-200 hover:ring-orange-400 ease-linear duration-150 cursor-pointer`,
-            header: {
-                padding: 'sm:p-3',
-            },
-            body: {
-                base: 'grow',
-                padding: 'sm:p-3',
-            },
-            footer: {
-                base: 'flex flex-wrap gap-2',
-                padding: 'sm:p-3',
-            },
-        }"
-        @click.prevent="open"
+    <UPageCard
+        variant="subtle"
+        class="cursor-pointer hover:ring-primary transition"
+        :ui="{ container: 'p-4' }"
+        @click="open"
     >
-        <template #header>
-            <div class="flex items-center justify-between">
-                <h3 class="text-xl">
-                    {{ item.name }}
-                </h3>
-                <ColoredLabel :bg-color="item.category.color">
+        <div
+            class="flex gap-3"
+            :class="view === EViewType.LIST ? 'items-center' : 'flex-col h-full'"
+        >
+            <div
+                class="flex items-start justify-between gap-2"
+                :class="view === EViewType.LIST ? 'grow items-center' : ''"
+            >
+                <h3 class="font-semibold text-highlighted truncate">{{ item.name }}</h3>
+                <ColoredLabel
+                    v-if="item.category"
+                    :bg-color="item.category.color"
+                    class="shrink-0 uppercase text-[10px]"
+                >
                     {{ item.category.label }}
                 </ColoredLabel>
             </div>
-        </template>
 
-        <div
-            v-if="item.description"
-            class=""
-        >
-            <p>Описание:</p>
-            {{ item.description }}
-        </div>
-
-        <template #footer>
-            <UButton
-                class="shrink-0"
-                size="xs"
-                color="orange"
-                square
-                variant="solid"
-                :loading="isRemoving"
-                @click.prevent.stop="remove"
+            <div
+                v-if="item.description && view !== EViewType.LIST"
+                class="text-sm text-muted line-clamp-2 grow"
             >
-                <template #trailing>
-                    <svgo-delete class="w-4 h-4" />
-                </template>
-            </UButton>
-        </template>
-    </UCard>
+                {{ item.description }}
+            </div>
+
+            <UBadge
+                v-if="item.project && view !== EViewType.LIST"
+                color="neutral"
+                variant="subtle"
+                class="w-fit"
+            >
+                {{ item.project.name }}
+            </UBadge>
+
+            <div
+                class="flex items-center justify-between gap-2 text-xs text-muted"
+                :class="view === EViewType.LIST ? 'shrink-0' : 'pt-2 border-t border-default'"
+            >
+                Updated {{ updatedAgo }}
+            </div>
+        </div>
+    </UPageCard>
 </template>

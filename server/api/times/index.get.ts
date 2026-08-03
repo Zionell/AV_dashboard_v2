@@ -1,30 +1,64 @@
 import { dbClient } from '~~/lib/dbClient';
+import { EUserRole } from '#shared/types/user';
 
 interface IQuery {
-    userId: string;
-    range: string;
-}
-
-interface IParsedRange {
-    start: string;
-    end: string;
+    userId?: string;
+    from?: string;
+    to?: string;
 }
 
 export default defineEventHandler(async (event) => {
     try {
-        const { userId, range }: IQuery = getQuery(event);
-        const parsedRange: IParsedRange = range ? JSON.parse(range) : null;
+        const user = requireApiUser(event);
+        const { userId, from, to }: IQuery = getQuery(event);
 
-        console.log('range', parsedRange?.start);
-        console.log('range', parsedRange?.end);
+        let targetUserId = user.id;
+
+        // OWNER — время любого сотрудника компании; MANAGER — только участников своих проектов.
+        if (userId && userId !== user.id && hasRole(user, EUserRole.OWNER, EUserRole.MANAGER)) {
+            const companyId = requireCompanyId(event);
+
+            const target = hasRole(user, EUserRole.OWNER)
+                ? await dbClient.user.findFirst({
+                      where: { id: userId, companyId },
+                      select: { id: true },
+                  })
+                : await dbClient.user.findFirst({
+                      where: {
+                          id: userId,
+                          companyId,
+                          projects: {
+                              some: {
+                                  project: {
+                                      users: {
+                                          some: {
+                                              userId: user.id,
+                                          },
+                                      },
+                                  },
+                              },
+                          },
+                      },
+                      select: { id: true },
+                  });
+
+            if (!target) throw createError({ statusCode: 404, message: 'Member not found' });
+
+            targetUserId = target.id;
+        }
+
+        const createdAt =
+            from || to
+                ? {
+                      ...(from ? { gte: new Date(from) } : {}),
+                      ...(to ? { lte: new Date(to) } : {}),
+                  }
+                : undefined;
 
         const items = await dbClient.times.findMany({
             where: {
-                // createdAt: {
-                //     gt: parsedRange?.start ? parsedRange.start : '',
-                //     lte: parsedRange?.end ? parsedRange.end : '',
-                // },
-                userId,
+                userId: targetUserId,
+                ...(createdAt ? { createdAt } : {}),
             },
             orderBy: {
                 createdAt: 'asc',
@@ -33,7 +67,7 @@ export default defineEventHandler(async (event) => {
 
         return items || [];
     } catch (e) {
-        console.warn('Times all/ get: ', e);
+        logger.warn('Times all/ get: ', e);
         throw e;
     }
 });

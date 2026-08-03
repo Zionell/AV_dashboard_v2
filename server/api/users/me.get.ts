@@ -1,28 +1,17 @@
-import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { dbClient } from '~~/lib/dbClient';
 
 export default defineEventHandler(async (event) => {
-    try {
-        const runtimeConfig = useRuntimeConfig();
-        const jwtSecret = runtimeConfig.JWT_SALT;
-        const cookies = parseCookies(event);
+    const sessionUser = event.context.user;
 
-        if (!cookies?.auth_token) throw createError({ statusCode: 401, message: 'Unauthorized' });
+    if (!sessionUser) throw createError({ statusCode: 401, message: 'Unauthorized' });
 
-        const decoded = jwt.verify(cookies.auth_token, jwtSecret) as JwtPayload;
+    const res = await dbClient.user.findUnique({
+        where: { id: sessionUser.id },
+    });
 
-        if (!decoded?.id) throw createError({ statusCode: 401, message: 'Unauthorized' });
+    if (!res) throw createError({ statusCode: 401, message: 'Unauthorized' });
 
-        const res = await dbClient.user.findUnique({
-            where: { id: decoded.id },
-        });
+    const { hash: _, ...user } = res;
 
-        if (!res) throw createError({ statusCode: 401, message: 'Unauthorized' });
-
-        const { hash: _, ...user } = res;
-
-        return user;
-    } catch (e) {
-        throw e;
-    }
+    return user;
 });

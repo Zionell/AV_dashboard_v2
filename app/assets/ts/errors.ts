@@ -1,3 +1,3 @@
 export const ERROR_MESSAGES = {
-    404: 'Страница не найдена',
+    404: 'Page not found',
 } as const;

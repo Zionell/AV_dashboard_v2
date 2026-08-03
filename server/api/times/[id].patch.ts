@@ -1,24 +1,20 @@
 import { dbClient } from '~~/lib/dbClient';
 
 export default defineEventHandler(async (event) => {
-    try {
-        const id = getRouterParam(event, 'id');
-        const body = await readBody(event);
+    const user = requireApiUser(event);
+    const id = getRouterParam(event, 'id');
 
-        await dbClient.times.update({
-            where: { id },
-            data: {
-                user: {
-                    connect: {
-                        id: body?.userId ?? '',
-                    },
-                },
-                active: false,
-            },
-        });
+    const { count } = await dbClient.times.updateMany({
+        where: {
+            id,
+            userId: user.id,
+        },
+        data: {
+            active: false,
+        },
+    });
 
-        setResponseStatus(event, 200);
-    } catch (e) {
-        return e;
-    }
+    if (!count) throw createError({ statusCode: 404, message: 'Record not found' });
+
+    setResponseStatus(event, 200);
 });

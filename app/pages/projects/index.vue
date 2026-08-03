@@ -1,9 +1,7 @@
 <script setup lang="ts">
 const userStore = useUserStore();
 
-const modalRef = useTemplateRef('modalRef');
-
-const { data, error, status, refresh } = await useFetch('/api/projects', {
+const { data, error, status } = await useFetch<{ results: IProject[]; count: number }>('/api/projects', {
     query: {
         userId: userStore.user?.id,
     },
@@ -18,7 +16,7 @@ if (error.value) {
 }
 
 function handleAddNew() {
-    modalRef.value?.open();
+    navigateTo(`${ERoutes.PROJECTS}/new`);
 }
 </script>
 
@@ -36,9 +34,12 @@ function handleAddNew() {
                 </template>
 
                 <template #right>
-                    <AddNewProject
-                        ref="modalRef"
-                        @refresh="refresh"
+                    <UButton
+                        v-if="userStore.canManageContent"
+                        icon="i-lucide-plus"
+                        label="Create project"
+                        size="lg"
+                        :to="`${ERoutes.PROJECTS}/new`"
                     />
                 </template>
             </UDashboardToolbar>
@@ -70,13 +71,17 @@ function handleAddNew() {
                 icon="i-lucide-file"
                 title="No projects found"
                 description="It looks like you haven't added any projects. Create one to get started."
-                :actions="[
-                    {
-                        icon: 'i-lucide-plus',
-                        label: 'Create new',
-                        onClick: handleAddNew,
-                    },
-                ]"
+                :actions="
+                    userStore.canManageContent
+                        ? [
+                              {
+                                  icon: 'i-lucide-plus',
+                                  label: 'Create new',
+                                  onClick: handleAddNew,
+                              },
+                          ]
+                        : []
+                "
             />
         </template>
     </UDashboardPanel>

@@ -19,4 +19,12 @@ export interface IUserMe extends IUserShort {
     companyId: string | null;
     bio: string | null;
     hasPassword: boolean;
+    /** Личная норма рабочего дня в часах — задаётся пригласившим. */
+    workHours: number;
+}
+
+export interface IMember extends IUserShort {
+    createdAt: string;
+    updatedAt: string;
+    timeWeekMs: number;
 }

@@ -1,14 +1,15 @@
 import { dbClient } from '~~/lib/dbClient';
-import type { IUserSpec } from '#shared/types/user';
+import { EUserRole, type IUserSpec } from '#shared/types/user';
 
 export default defineEventHandler(async (event): Promise<IUserSpec[]> => {
     try {
-        const { id }: { id: string } = getQuery(event);
+        requireRole(event, EUserRole.OWNER, EUserRole.MANAGER);
+        const companyId = requireCompanyId(event);
 
         const items = await dbClient.user.findMany({
             take: 14,
             where: {
-                companyId: id,
+                companyId: companyId,
             },
             select: {
                 id: true,
@@ -18,7 +19,7 @@ export default defineEventHandler(async (event): Promise<IUserSpec[]> => {
 
         return items || [];
     } catch (e) {
-        console.warn('Projects specs/ get: ', e);
+        logger.warn('Users specs/ get: ', e);
         throw e;
     }
 });

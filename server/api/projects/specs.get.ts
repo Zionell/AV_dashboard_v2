@@ -1,13 +1,13 @@
 import { dbClient } from '~~/lib/dbClient';
 
-export default defineEventHandler(async (event): Promise<any[]> => {
+export default defineEventHandler(async (event) => {
     try {
-        const { id }: { id: string } = getQuery(event);
+        const companyId = requireCompanyId(event);
 
         const items = await dbClient.project.findMany({
             take: 10,
             where: {
-                companyId: id,
+                companyId,
             },
             select: {
                 id: true,
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event): Promise<any[]> => {
 
         return items || [];
     } catch (e) {
-        console.warn('Projects specs/ get: ', e);
+        logger.warn('Projects specs/ get: ', e);
         throw e;
     }
 });

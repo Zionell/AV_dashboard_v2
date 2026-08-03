@@ -9,11 +9,13 @@ const props = defineProps<{
 const status = computed(() => (props.error?.statusCode === 404 ? 404 : 500));
 
 const textError = computed<string>(() =>
-    status.value in ERROR_MESSAGES ? ERROR_MESSAGES[status.value as keyof typeof ERROR_MESSAGES] : 'Техническая ошибка'
+    status.value in ERROR_MESSAGES
+        ? ERROR_MESSAGES[status.value as keyof typeof ERROR_MESSAGES]
+        : 'Something went wrong'
 );
 
 useSeoMeta({
-    title: `Ошибка - ${status.value}`,
+    title: `Error - ${status.value}`,
     description: textError.value,
 });
 
@@ -40,7 +42,7 @@ function handleError() {
                 class="mt-8"
                 @click="handleError"
             >
-                На главную
+                Go home
             </UButton>
         </section>
     </UApp>

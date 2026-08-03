@@ -10,10 +10,6 @@ const props = defineProps<IProps>();
 const isEmpty = computed(() => {
     return !props.users.length;
 });
-
-const userImage = (user: IUserShort) => {
-    return user?.image || '/images/avatar.png';
-};
 </script>
 
 <template>
@@ -21,7 +17,7 @@ const userImage = (user: IUserShort) => {
         title="Participants"
         :is-empty="isEmpty"
     >
-        <ul class="flex flex-col gap-4 h-56 custom__scroll">
+        <ul class="flex flex-col gap-4 h-56 custom__scroll p-4">
             <li
                 v-for="user in users"
                 :key="user.id"

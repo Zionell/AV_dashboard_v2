@@ -12,6 +12,8 @@ export const useUserStore = defineStore('user', () => {
 
     const isOwner = computed((): boolean => state.user?.role === EUserRole.OWNER);
     const isManager = computed((): boolean => state.user?.role === EUserRole.MANAGER);
+    const isEmployee = computed((): boolean => state.user?.role === EUserRole.EMPLOYEE);
+    const canManageContent = computed((): boolean => isOwner.value || isManager.value);
 
     async function fetchUser() {
         try {
@@ -37,6 +39,8 @@ export const useUserStore = defineStore('user', () => {
         ...toRefs(state),
         isOwner,
         isManager,
+        isEmployee,
+        canManageContent,
         fetchUser,
         updateUser,
     };
