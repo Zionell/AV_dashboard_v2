@@ -15,6 +15,7 @@
         "test:all": "npm run db:seed-test && vitest run",
         "db:push-test": "DOTENV_CONFIG_PATH=.env.test prisma db push",
         "db:seed-test": "node --experimental-transform-types scripts/seed-test-db.ts",
+        "db:seed-demo": "node --experimental-transform-types scripts/seed-demo.ts",
         "db-push": "prisma db push",
         "db-pull": "prisma db pull",
         "prisma-studio": "prisma studio",

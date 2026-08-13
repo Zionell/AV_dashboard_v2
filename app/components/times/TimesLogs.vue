@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
-import type { ETodoStatus, type ITimeLog } from '#shared/types/times';
+import type { ETodoStatus, ITimeLog } from '#shared/types/times';
 import { h, resolveComponent } from 'vue';
 import type { TableColumn } from '@nuxt/ui';
 import { getTodoColor } from '#server/utils/common';
