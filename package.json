@@ -11,7 +11,6 @@
         "prettier": "npx prettier . --write",
         "test": "vitest run --project unit",
         "test:watch": "vitest --project unit",
-        "db:seed-demo": "node --experimental-transform-types scripts/seed-demo.ts",
         "db-push": "prisma db push",
         "db-pull": "prisma db pull",
         "prisma-studio": "prisma studio",
