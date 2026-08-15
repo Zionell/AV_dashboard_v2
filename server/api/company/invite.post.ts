@@ -1,6 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { INVITE_TTL_DAYS } from '#shared/constants';
 
@@ -21,12 +21,12 @@ export default defineEventHandler(async (event) => {
         // бессмысленно. При принятии проверим ещё раз: места могут кончиться за это время.
         await assertSeatAvailable(companyId);
 
-        const company = await dbClient.company.findUnique({
+        const company = await prisma.company.findUnique({
             where: { id: companyId },
             select: { name: true },
         });
 
-        const existing = await dbClient.user.findUnique({
+        const existing = await prisma.user.findUnique({
             where: { email },
             select: { companyId: true },
         });
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'This user is already in your company' });
         }
 
-        const inviter = await dbClient.user.findUnique({
+        const inviter = await prisma.user.findUnique({
             where: { id: user.id },
             select: { name: true },
         });
@@ -44,14 +44,14 @@ export default defineEventHandler(async (event) => {
         // человек вошёл бы с неактуальной нормой часов.
         // На Mongo `acceptedAt: null` не матчит отсутствующее поле (у новых приглашений
         // оно не выставлено) — нужен ещё isSet: false, иначе старые ссылки не гаснут.
-        await dbClient.invitation.deleteMany({
+        await prisma.invitation.deleteMany({
             where: { email, companyId, OR: [{ acceptedAt: null }, { acceptedAt: { isSet: false } }] },
         });
 
         const token = randomBytes(32).toString('hex');
         const expiresAt = new Date(Date.now() + INVITE_TTL_DAYS * 24 * 60 * 60 * 1000);
 
-        await dbClient.invitation.create({
+        await prisma.invitation.create({
             data: { email, token, workHours, companyId, invitedById: user.id, expiresAt },
         });
 

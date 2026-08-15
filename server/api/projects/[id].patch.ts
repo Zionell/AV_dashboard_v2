@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { EProjectPriority, EProjectEventType } from '#shared/types/projects';
 
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
 
         const { users, links, ...fields } = body;
 
-        await dbClient.project.update({
+        await prisma.project.update({
             where: { id: projectId },
             data: {
                 ...fields,
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
             }
 
             if (keep.length) {
-                const members = await dbClient.user.count({
+                const members = await prisma.user.count({
                     where: { id: { in: keep }, companyId },
                 });
 
@@ -62,20 +62,20 @@ export default defineEventHandler(async (event) => {
                 }
             }
 
-            const existing = await dbClient.usersOnProjects.findMany({
+            const existing = await prisma.usersOnProjects.findMany({
                 where: { projectId },
                 select: { userId: true },
             });
             const existingIds = existing.map((e) => e.userId);
             const toAdd = keep.filter((userId) => !existingIds.includes(userId));
 
-            await dbClient.usersOnProjects.deleteMany({
+            await prisma.usersOnProjects.deleteMany({
                 where: { projectId, userId: { notIn: keep } },
             });
 
             // Mongo падает на createMany с пустым массивом.
             if (toAdd.length) {
-                await dbClient.usersOnProjects.createMany({
+                await prisma.usersOnProjects.createMany({
                     data: toAdd.map((userId) => ({ projectId, userId })),
                 });
             }

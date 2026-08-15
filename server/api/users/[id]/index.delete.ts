@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'To delete your own account, use profile settings' });
         }
 
-        const target = await dbClient.user.findFirst({
+        const target = await prisma.user.findFirst({
             where: { id, companyId },
             select: { id: true },
         });
@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
         if (!target) throw createError({ statusCode: 404, message: 'Member not found' });
 
         // Порядок важен: сначала отвязываем от проектов и переназначаем задачи, потом удаляем (times уйдут каскадом).
-        await dbClient.usersOnProjects.deleteMany({
+        await prisma.usersOnProjects.deleteMany({
             where: { userId: target.id },
         });
-        await dbClient.todo.updateMany({
+        await prisma.todo.updateMany({
             where: { executorId: target.id },
             data: { executorId: actor.id },
         });
-        await dbClient.user.delete({
+        await prisma.user.delete({
             where: { id: target.id },
         });
 

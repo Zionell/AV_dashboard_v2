@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 const bodySchema = z.object({
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
                   ],
               };
 
-        const material = await dbClient.material.findFirst({ where: scope, select: { id: true } });
+        const material = await prisma.material.findFirst({ where: scope, select: { id: true } });
 
         if (!material) throw createError({ statusCode: 404, message: 'Material not found' });
 
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
         const { projectId, ...rest } = body;
 
-        const updated = await dbClient.material.update({
+        const updated = await prisma.material.update({
             where: { id: material.id },
             data: {
                 ...rest,

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 const bodySchema = z.object({
     name: z.string().trim().min(1).optional(),
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         const sessionUser = requireApiUser(event);
         const data = await readValidatedBody(event, bodySchema.parse);
 
-        const updated = await dbClient.user.update({
+        const updated = await prisma.user.update({
             where: {
                 id: sessionUser.id,
             },

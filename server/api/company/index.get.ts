@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     try {
@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
         if (!user.companyId) return null;
 
-        const company = await dbClient.company.findUnique({
+        const company = await prisma.company.findUnique({
             where: { id: user.companyId },
             include: {
                 users: {

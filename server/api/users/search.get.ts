@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
         const companyId = requireCompanyId(event);
         const { search }: { search: string } = getQuery(event);
 
-        const users = await dbClient.user.findMany({
+        const users = await prisma.user.findMany({
             take: 10,
             skip: 0,
             where: {

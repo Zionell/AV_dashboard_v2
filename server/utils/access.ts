@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 type ApiUser = {
@@ -43,7 +43,7 @@ export async function requireProjectInCompany(event: H3Event, projectId: string 
     const companyId = requireCompanyId(event);
 
     const project = projectId
-        ? await dbClient.project.findFirst({
+        ? await prisma.project.findFirst({
               where: { id: projectId, companyId },
               select: { id: true },
           })
@@ -68,7 +68,7 @@ export async function requireProjectMembership(event: H3Event, projectId: string
     const companyId = requireCompanyId(event);
 
     const membership = projectId
-        ? await dbClient.usersOnProjects.findFirst({
+        ? await prisma.usersOnProjects.findFirst({
               where: {
                   projectId,
                   userId: user.id,
@@ -89,7 +89,7 @@ export async function requireTodoInScope(
     todoId: string | undefined
 ): Promise<{ id: string; projectId: string; name: string }> {
     const todo = todoId
-        ? await dbClient.todo.findFirst({
+        ? await prisma.todo.findFirst({
               where: { id: todoId, project: projectScope(event) },
               select: { id: true, projectId: true, name: true },
           })
@@ -109,7 +109,7 @@ export async function requireCategoryInScope(event: H3Event, categoryId: string 
     const companyId = requireCompanyId(event);
 
     const category = categoryId
-        ? await dbClient.materialCategory.findFirst({
+        ? await prisma.materialCategory.findFirst({
               where: { id: categoryId, companyId },
               select: { id: true },
           })

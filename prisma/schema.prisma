@@ -1,6 +1,17 @@
+// `prisma-client` вместо legacy `prisma-client-js`: тот копировал к себе CJS-рантайм с
+// `__dirname`, который Nitro инлайнил в ESM-бандл — прод падал с «__dirname is not
+// defined». Новый генератор импортирует `@prisma/client/runtime/library`, и в ESM-сборке
+// рантайма (`library.mjs`) `__dirname` объявлен самой Prisma.
+// importFileExtension = "ts": по умолчанию генератор пишет внутри себя импорты вида
+// `./enums.js`, которых на диске нет (файлы .ts). Vite это переживает, а голый node
+// в скриптах (`node --experimental-transform-types scripts/*.ts`) падает с
+// ERR_MODULE_NOT_FOUND. С «ts» пути совпадают с реальными файлами для обоих.
 generator client {
-    provider = "prisma-client-js"
-    output   = "./generated/prisma"
+    provider            = "prisma-client"
+    output              = "./generated/prisma"
+    runtime             = "nodejs"
+    moduleFormat        = "esm"
+    importFileExtension = "ts"
 }
 
 datasource db {

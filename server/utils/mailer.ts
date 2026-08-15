@@ -14,7 +14,7 @@
 //     },
 // });
 
-export interface IMailOptions {
+interface IMailOptions {
     to: string;
     subject: string;
     text: string;

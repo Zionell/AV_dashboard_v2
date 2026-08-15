@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { EProjectPriority, EProjectEventType } from '#shared/types/projects';
 
@@ -39,7 +39,7 @@ export default defineEventHandler(async (event) => {
         }
 
         if (usersArr.length) {
-            const members = await dbClient.user.count({
+            const members = await prisma.user.count({
                 where: {
                     id: { in: usersArr },
                     companyId,
@@ -51,7 +51,7 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-        const project = await dbClient.project.create({
+        const project = await prisma.project.create({
             data: {
                 name: body.name,
                 image: body.image ?? null,

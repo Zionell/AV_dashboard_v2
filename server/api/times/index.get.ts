@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 interface IQuery {
@@ -19,11 +19,11 @@ export default defineEventHandler(async (event) => {
             const companyId = requireCompanyId(event);
 
             const target = hasRole(user, EUserRole.OWNER)
-                ? await dbClient.user.findFirst({
+                ? await prisma.user.findFirst({
                       where: { id: userId, companyId },
                       select: { id: true },
                   })
-                : await dbClient.user.findFirst({
+                : await prisma.user.findFirst({
                       where: {
                           id: userId,
                           companyId,
@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
                   }
                 : undefined;
 
-        const items = await dbClient.times.findMany({
+        const items = await prisma.times.findMany({
             where: {
                 userId: targetUserId,
                 ...(createdAt ? { createdAt } : {}),

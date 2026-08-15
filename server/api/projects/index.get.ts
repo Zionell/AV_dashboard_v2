@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     try {
@@ -6,7 +6,7 @@ export default defineEventHandler(async (event) => {
 
         const where = projectScope(event);
 
-        const projects = await dbClient.project.findMany({
+        const projects = await prisma.project.findMany({
             take: Number(take),
             skip: Number(skip),
             where,
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
                 },
             },
         });
-        const count = await dbClient.project.count({ where });
+        const count = await prisma.project.count({ where });
 
         return { results: projects, count };
     } catch (e) {

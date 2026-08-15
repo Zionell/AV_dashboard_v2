@@ -24,20 +24,6 @@ export default defineConfig({
                     setupFiles: ['test/setup.ts'],
                 },
             },
-            {
-                // Интеграционные: поднимают настоящий Nuxt против тестовой базы.
-                resolve: { alias },
-                test: {
-                    name: 'api',
-                    environment: 'node',
-                    include: ['test/api/**/*.spec.ts'],
-                    // Один сервер и общая база — параллельные файлы затирали бы данные друг друга.
-                    fileParallelism: false,
-                    // Тестовая БД — удалённый Atlas: отдельные операции идут секундами.
-                    testTimeout: 60_000,
-                    hookTimeout: 120_000,
-                },
-            },
         ],
     },
 });

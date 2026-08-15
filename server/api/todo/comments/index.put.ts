@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 const bodySchema = z.object({
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         const body = await readValidatedBody(event, bodySchema.parse);
 
         const comment = id
-            ? await dbClient.todoComment.findFirst({
+            ? await prisma.todoComment.findFirst({
                   where: { id, todo: { project: projectScope(event) } },
                   select: { id: true },
               })
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
         if (!comment) throw createError({ statusCode: 404, message: 'Comment not found' });
 
-        return await dbClient.todoComment.update({
+        return await prisma.todoComment.update({
             where: { id: comment.id },
             data: { text: body.text },
             include: { author: { select: { id: true, name: true, image: true } } },

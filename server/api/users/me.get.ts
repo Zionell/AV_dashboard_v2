@@ -1,11 +1,11 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     const sessionUser = event.context.user;
 
     if (!sessionUser) throw createError({ statusCode: 401, message: 'Unauthorized' });
 
-    const res = await dbClient.user.findUnique({
+    const res = await prisma.user.findUnique({
         where: { id: sessionUser.id },
     });
 

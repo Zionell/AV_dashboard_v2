@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import type { ITaskComment } from '#shared/types/todo';
 
 export default defineEventHandler(async (event): Promise<ITaskComment[]> => {
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event): Promise<ITaskComment[]> => {
 
         await requireTodoInScope(event, todoId);
 
-        return await dbClient.todoComment.findMany({
+        return await prisma.todoComment.findMany({
             where: { todoId },
             include: { author: { select: { id: true, name: true, image: true } } },
             orderBy: { createdAt: 'asc' },

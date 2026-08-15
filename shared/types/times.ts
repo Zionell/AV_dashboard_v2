@@ -1,4 +1,3 @@
-export type Period = 'daily' | 'weekly' | 'monthly';
 export const enum ETodoStatus {
     TODO = 'TODO',
     IN_PROGRESS = 'IN_PROGRESS',

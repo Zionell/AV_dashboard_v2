@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
                   ],
               };
 
-        const material = await dbClient.material.findFirst({
+        const material = await prisma.material.findFirst({
             where: scope,
             include: {
                 category: true,

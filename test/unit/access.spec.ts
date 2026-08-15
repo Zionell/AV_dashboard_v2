@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { H3Event } from 'h3';
 import { EUserRole } from '#shared/types/user';
 
-vi.mock('~~/lib/dbClient', () => ({
-    dbClient: {
+vi.mock('~~/server/utils/prisma', () => ({
+    prisma: {
         project: { findFirst: vi.fn() },
         usersOnProjects: { findFirst: vi.fn() },
         todo: { findFirst: vi.fn() },
@@ -11,7 +11,7 @@ vi.mock('~~/lib/dbClient', () => ({
     },
 }));
 
-const { dbClient } = await import('~~/lib/dbClient');
+const { prisma } = await import('~~/server/utils/prisma');
 const {
     requireApiUser,
     requireCompanyId,
@@ -24,7 +24,7 @@ const {
     projectScope,
 } = await import('~~/server/utils/access');
 
-const db = dbClient as unknown as {
+const db = prisma as unknown as {
     project: { findFirst: ReturnType<typeof vi.fn> };
     usersOnProjects: { findFirst: ReturnType<typeof vi.fn> };
     todo: { findFirst: ReturnType<typeof vi.fn> };

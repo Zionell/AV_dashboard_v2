@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     try {
@@ -6,12 +6,12 @@ export default defineEventHandler(async (event) => {
         const projectId = await requireProjectMembership(event, curProjectId);
 
         const [allTodos, completed] = await Promise.all([
-            dbClient.todo.count({
+            prisma.todo.count({
                 where: {
                     projectId,
                 },
             }),
-            dbClient.todo.count({
+            prisma.todo.count({
                 where: {
                     projectId,
                     isCompleted: true,

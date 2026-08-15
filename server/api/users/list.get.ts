@@ -1,5 +1,5 @@
 import { startOfWeek } from 'date-fns';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 type QueryType = {
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         const companyId = requireCompanyId(event);
         const { take = '15', skip = '0', order = 'desc', q }: QueryType = getQuery(event);
 
-        const users = await dbClient.user.findMany({
+        const users = await prisma.user.findMany({
             take: Number(take),
             skip: Number(skip),
             where: {
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
                 name: order,
             },
         });
-        const count = await dbClient.user.count({
+        const count = await prisma.user.count({
             where: {
                 companyId: companyId,
             },
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
         // Отработанное время за текущую неделю по пользователям страницы.
         const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
-        const times = await dbClient.times.findMany({
+        const times = await prisma.times.findMany({
             where: {
                 userId: { in: users.map((u) => u.id) },
                 createdAt: { gte: weekStart },

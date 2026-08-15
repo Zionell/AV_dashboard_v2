@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { ETodoStatus } from '#shared/types/times';
 import { EProjectEventType } from '#shared/types/projects';
 
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // Смена статуса доступна всем ролям в рамках их проектов (owner — вся компания).
-        const existing = await dbClient.todo.findFirst({
+        const existing = await prisma.todo.findFirst({
             where: {
                 id,
                 project: projectScope(event),
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
         if (!existing) throw createError({ statusCode: 404, message: 'Task not found' });
 
-        await dbClient.todo.update({
+        await prisma.todo.update({
             where: { id: existing.id },
             data: {
                 status,

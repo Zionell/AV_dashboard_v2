@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import type { ITaskAttachmentFull } from '#shared/types/todo';
 
 // Содержимое одного вложения. Список (index.get) отдаёт только метаданные,
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event): Promise<ITaskAttachmentFull> =>
         const id = getRouterParam(event, 'id');
 
         const attachment = id
-            ? await dbClient.todoAttachment.findFirst({
+            ? await prisma.todoAttachment.findFirst({
                   where: { id, todo: { project: projectScope(event) } },
                   select: {
                       id: true,

@@ -1,4 +1,4 @@
-import { PrismaClient } from '~~/prisma/generated/prisma';
+import { PrismaClient } from '~~/prisma/generated/prisma/client';
 
 const prismaClientSingleton = () => {
     return new PrismaClient();
@@ -10,6 +10,6 @@ const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClientSingleton | undefined;
 };
 
-export const dbClient = globalForPrisma.prisma ?? prismaClientSingleton();
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = dbClient;
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { ETodoStatus } from '#shared/types/times';
 import { ETaskPriority } from '#shared/types/todo';
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
         // Менеджер может создавать задачи только в своих проектах, owner — в любых проектах компании.
         await requireProjectMembership(event, body.projectId);
 
-        const executor = await dbClient.user.findFirst({
+        const executor = await prisma.user.findFirst({
             where: { id: body.executorId, companyId },
             select: { id: true },
         });
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
 
         const status = body.status ?? ETodoStatus.TODO;
 
-        const todo = await dbClient.todo.create({
+        const todo = await prisma.todo.create({
             data: {
                 name: body.name,
                 description: body.description ?? '',

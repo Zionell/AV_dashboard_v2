@@ -12,7 +12,7 @@
  */
 import 'dotenv/config';
 import bcrypt from 'bcryptjs';
-import { PrismaClient } from '../prisma/generated/prisma/index.js';
+import { PrismaClient } from '../prisma/generated/prisma/client.ts';
 import { ECompanyPlan } from '../shared/types/company.ts';
 import { ETodoStatus } from '../shared/types/times.ts';
 import {
@@ -159,10 +159,6 @@ if (!url) {
 }
 
 const dbName = new URL(url).pathname.slice(1);
-
-if (/test/i.test(dbName)) {
-    throw new Error(`Отказ: «${dbName}» — тестовая база, у неё свой сид (npm run db:seed-test)`);
-}
 
 const db = new PrismaClient({ datasources: { db: { url } } });
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EProjectEventType } from '#shared/types/projects';
 import { MAX_ATTACHMENTS_PER_TASK } from '#shared/constants';
 
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
         const todo = await requireTodoInScope(event, body.todoId);
         const size = decodedSize(body.data);
 
-        const attachmentCount = await dbClient.todoAttachment.count({ where: { todoId: body.todoId } });
+        const attachmentCount = await prisma.todoAttachment.count({ where: { todoId: body.todoId } });
 
         if (attachmentCount >= MAX_ATTACHMENTS_PER_TASK) {
             throw createError({
@@ -77,7 +77,7 @@ export default defineEventHandler(async (event) => {
 
         // Возвращаем только метаданные — клиент уже держит загруженный файл у себя,
         // эхо base64 обратно удвоило бы трафик на пустом месте.
-        const attachment = await dbClient.todoAttachment.create({
+        const attachment = await prisma.todoAttachment.create({
             data: {
                 name: body.name,
                 data: body.data,

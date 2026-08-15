@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import type { MaterialSortKey } from '#shared/types/material';
 
@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
         };
 
         const [results, count] = await Promise.all([
-            dbClient.material.findMany({
+            prisma.material.findMany({
                 take: Number(take),
                 skip: Number(skip),
                 where,
@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
                 },
                 orderBy: orderByMap[sort] || orderByMap.newest,
             }),
-            dbClient.material.count({ where }),
+            prisma.material.count({ where }),
         ]);
 
         return { results, count };

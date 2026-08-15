@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 const bodySchema = z.object({
     projectId: z.string().optional(),
@@ -20,7 +20,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'A task must be specified together with a project' });
         }
 
-        const todo = await dbClient.todo.findFirst({
+        const todo = await prisma.todo.findFirst({
             where: { id: body.todoId, projectId: body.projectId },
             select: { id: true },
         });
@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
         if (!todo) throw createError({ statusCode: 404, message: 'Task not found' });
     }
 
-    return dbClient.times.create({
+    return prisma.times.create({
         data: {
             active: true,
             user: {

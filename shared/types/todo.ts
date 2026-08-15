@@ -1,4 +1,4 @@
-import type { Todo } from '~~/prisma/generated/prisma';
+import type { Todo } from '~~/prisma/generated/prisma/client';
 import type { ETodoStatus } from '#shared/types/times';
 
 /**
@@ -12,11 +12,6 @@ export enum ETaskPriority {
 }
 
 export type TaskSortKey = 'newest' | 'oldest' | 'due' | 'priority';
-
-export interface ITodoProgress {
-    allTodos: number;
-    completed: number;
-}
 
 interface ITaskPerson {
     id: string;

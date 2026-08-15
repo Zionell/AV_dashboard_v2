@@ -1,5 +1,5 @@
 import { startOfDay, startOfWeek } from 'date-fns';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { ETodoStatus } from '#shared/types/times';
 import type { IProjectDetail, IProjectMemberStat, IProjectEvent, EProjectEventType } from '#shared/types/projects';
 import type { EUserRole } from '#shared/types/user';
@@ -10,7 +10,7 @@ export default defineEventHandler(async (event): Promise<IProjectDetail> => {
 
         const projectId = await requireProjectMembership(event, id);
 
-        const project = await dbClient.project.findFirst({
+        const project = await prisma.project.findFirst({
             where: { id: projectId },
             include: {
                 todo: {
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event): Promise<IProjectDetail> => {
         const dayStart = startOfDay(now);
         const weekStart = startOfWeek(now, { weekStartsOn: 1 });
 
-        const sessions = await dbClient.times.findMany({
+        const sessions = await prisma.times.findMany({
             where: { todo: { projectId } },
             select: { userId: true, active: true, createdAt: true, updatedAt: true },
         });
@@ -107,7 +107,7 @@ export default defineEventHandler(async (event): Promise<IProjectDetail> => {
                 updatedAt: t.updatedAt.toISOString(),
             }));
 
-        const eventRows = await dbClient.event.findMany({
+        const eventRows = await prisma.event.findMany({
             where: { projectId },
             include: { actor: { select: { id: true, name: true, image: true } } },
             orderBy: { createdAt: 'desc' },

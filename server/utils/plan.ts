@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { ECompanyPlan, COMPANY_PLANS, type ICompanyPlanLimits, type ICompanyPlanState } from '#shared/types/company';
 import { formatBytes } from '#shared/utils/format';
 
@@ -21,10 +21,10 @@ export function planLimits(raw: string | null | undefined): ICompanyPlanLimits {
  */
 export async function getCompanyPlanState(companyId: string): Promise<ICompanyPlanState> {
     const [company, seats, projects, storage] = await Promise.all([
-        dbClient.company.findUnique({ where: { id: companyId }, select: { plan: true } }),
-        dbClient.user.count({ where: { companyId } }),
-        dbClient.project.count({ where: { companyId } }),
-        dbClient.todoAttachment.aggregate({ _sum: { size: true }, where: { companyId } }),
+        prisma.company.findUnique({ where: { id: companyId }, select: { plan: true } }),
+        prisma.user.count({ where: { companyId } }),
+        prisma.project.count({ where: { companyId } }),
+        prisma.todoAttachment.aggregate({ _sum: { size: true }, where: { companyId } }),
     ]);
 
     const plan = toPlan(company?.plan);

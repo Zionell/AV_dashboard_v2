@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 const bodySchema = z.object({
@@ -15,11 +15,11 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'Company already exists' });
         }
 
-        const company = await dbClient.company.create({
+        const company = await prisma.company.create({
             data: { name: body.name },
         });
 
-        await dbClient.user.update({
+        await prisma.user.update({
             where: {
                 id: user.id,
             },

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 const bodySchema = z.object({
     email: z.email('Invalid email').transform((v) => v.toLowerCase()),
@@ -10,13 +10,13 @@ const bodySchema = z.object({
 export default defineEventHandler(async (event) => {
     const { email, password } = await readValidatedBody(event, bodySchema.parse);
 
-    let user = await dbClient.user.findUnique({ where: { email } });
+    let user = await prisma.user.findUnique({ where: { email } });
     let isNew = false;
 
     if (!user) {
         const hash = await bcrypt.hash(password, 10);
 
-        user = await dbClient.user.create({
+        user = await prisma.user.create({
             data: {
                 email,
                 name: email.split('@')[0] ?? '',

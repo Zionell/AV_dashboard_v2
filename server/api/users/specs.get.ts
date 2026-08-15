@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole, type IUserSpec } from '#shared/types/user';
 
 export default defineEventHandler(async (event): Promise<IUserSpec[]> => {
@@ -6,7 +6,7 @@ export default defineEventHandler(async (event): Promise<IUserSpec[]> => {
         requireRole(event, EUserRole.OWNER, EUserRole.MANAGER);
         const companyId = requireCompanyId(event);
 
-        const items = await dbClient.user.findMany({
+        const items = await prisma.user.findMany({
             take: 14,
             where: {
                 companyId: companyId,

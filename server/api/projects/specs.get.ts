@@ -1,10 +1,10 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     try {
         const companyId = requireCompanyId(event);
 
-        const items = await dbClient.project.findMany({
+        const items = await prisma.project.findMany({
             take: 10,
             where: {
                 companyId,

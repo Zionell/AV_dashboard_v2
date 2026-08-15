@@ -1,11 +1,11 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     try {
         const { curProjectId }: { curProjectId: string } = getQuery(event);
         const projectId = await requireProjectMembership(event, curProjectId);
 
-        const items = await dbClient.todo.groupBy({
+        const items = await prisma.todo.groupBy({
             by: ['status'],
             where: {
                 projectId,

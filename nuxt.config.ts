@@ -86,11 +86,6 @@ export default defineNuxtConfig({
 
     // Security
     csurf: {
-        // CSRF выключаем только в интеграционных тестах: тест-клиент не воспроизводит
-        // парную куку/заголовок. Тесты идут против dev-сервера (nuxi _dev жёстко ставит
-        // NODE_ENV=development), поэтому ориентируемся на явный флаг из харнесса, а не на
-        // NODE_ENV. Флаг ставит только тестовый харнесс — в проде его нет.
-        enabled: !(process.env.NODE_ENV === 'test' || process.env.NUXT_DISABLE_CSRF === 'true'),
         https: !env.DEV,
         cookie: {
             path: '/',
@@ -102,10 +97,9 @@ export default defineNuxtConfig({
         headerName: 'csrf-token',
     },
 
-    // @nuxt/eslint — генерирует .nuxt/eslint.config.mjs; stylistic включает @stylistic-правила из eslint.config.mjs
     eslint: {
         config: {
-            stylistic: true,
+            stylistic: env.DEV,
         },
     },
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 const bodySchema = z.object({
@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
         const { user: sessionUser } = await requireUserSession(event);
         const { token } = await readValidatedBody(event, bodySchema.parse);
 
-        const current = await dbClient.user.findUnique({
+        const current = await prisma.user.findUnique({
             where: { id: sessionUser.id },
             select: { id: true, email: true, companyId: true },
         });
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
             throw createError({ statusCode: 400, message: 'You already belong to a company' });
         }
 
-        const invitation = await dbClient.invitation.findUnique({ where: { token } });
+        const invitation = await prisma.invitation.findUnique({ where: { token } });
 
         // Одна формулировка на все случаи: не подсказываем, существует ли токен вообще.
         if (!invitation || invitation.acceptedAt || invitation.expiresAt < new Date()) {
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event) => {
         // Между отправкой и принятием места могли занять — проверяем повторно.
         await assertSeatAvailable(invitation.companyId);
 
-        const updated = await dbClient.user.update({
+        const updated = await prisma.user.update({
             where: { id: current.id },
             data: {
                 companyId: invitation.companyId,
@@ -50,7 +50,7 @@ export default defineEventHandler(async (event) => {
             },
         });
 
-        await dbClient.invitation.update({
+        await prisma.invitation.update({
             where: { id: invitation.id },
             data: { acceptedAt: new Date() },
         });

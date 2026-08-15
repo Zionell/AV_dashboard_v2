@@ -1,9 +1,9 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { ETodoStatus } from '#shared/types/times';
 
 export default defineEventHandler(async (event) => {
     try {
-        const items = await dbClient.todo.findMany({
+        const items = await prisma.todo.findMany({
             where: {
                 project: projectScope(event),
                 status: ETodoStatus.IN_PROGRESS,

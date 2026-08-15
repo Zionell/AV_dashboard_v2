@@ -1,5 +1,5 @@
 import { format, startOfDay, startOfMonth, startOfWeek } from 'date-fns';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import type { ITeamSummaryRow } from '#shared/types/times';
 
@@ -12,22 +12,22 @@ export default defineEventHandler(async (event): Promise<ITeamSummaryRow[]> => {
         let members;
 
         if (hasRole(user, EUserRole.OWNER)) {
-            members = await dbClient.user.findMany({
+            members = await prisma.user.findMany({
                 where: { companyId },
                 select: { id: true, name: true, image: true, workHours: true },
             });
         } else {
-            const own = await dbClient.usersOnProjects.findMany({
+            const own = await prisma.usersOnProjects.findMany({
                 where: { userId: user.id },
                 select: { projectId: true },
             });
-            const links = await dbClient.usersOnProjects.findMany({
+            const links = await prisma.usersOnProjects.findMany({
                 where: { projectId: { in: own.map((p) => p.projectId) } },
                 select: { userId: true },
             });
             const ids = [...new Set([user.id, ...links.map((l) => l.userId)])];
 
-            members = await dbClient.user.findMany({
+            members = await prisma.user.findMany({
                 where: { id: { in: ids }, companyId },
                 select: { id: true, name: true, image: true, workHours: true },
             });
@@ -38,7 +38,7 @@ export default defineEventHandler(async (event): Promise<ITeamSummaryRow[]> => {
         const weekStart = startOfWeek(now, { weekStartsOn: 1 });
         const monthStart = startOfMonth(now);
 
-        const sessions = await dbClient.times.findMany({
+        const sessions = await prisma.times.findMany({
             where: {
                 userId: { in: members.map((m) => m.id) },
                 createdAt: { gte: monthStart },

@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
                   ],
               };
 
-        const { count } = await dbClient.material.deleteMany({ where });
+        const { count } = await prisma.material.deleteMany({ where });
 
         if (!count) throw createError({ statusCode: 404, message: 'Material not found' });
 

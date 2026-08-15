@@ -1,17 +1,17 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
     try {
         const user = requireApiUser(event);
 
-        await dbClient.usersOnProjects.deleteMany({
+        await prisma.usersOnProjects.deleteMany({
             where: { userId: user.id },
         });
 
         // Задачи передаём другому владельцу компании; если его нет — удаляем.
         const fallbackOwner = user.companyId
-            ? await dbClient.user.findFirst({
+            ? await prisma.user.findFirst({
                   where: {
                       companyId: user.companyId,
                       role: EUserRole.OWNER,
@@ -22,17 +22,17 @@ export default defineEventHandler(async (event) => {
             : null;
 
         if (fallbackOwner) {
-            await dbClient.todo.updateMany({
+            await prisma.todo.updateMany({
                 where: { executorId: user.id },
                 data: { executorId: fallbackOwner.id },
             });
         } else {
-            await dbClient.todo.deleteMany({
+            await prisma.todo.deleteMany({
                 where: { executorId: user.id },
             });
         }
 
-        await dbClient.user.delete({
+        await prisma.user.delete({
             where: { id: user.id },
         });
 

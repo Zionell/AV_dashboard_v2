@@ -1,10 +1,10 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     const user = requireApiUser(event);
     const id = getRouterParam(event, 'id');
 
-    const { count } = await dbClient.times.updateMany({
+    const { count } = await prisma.times.updateMany({
         where: {
             id,
             userId: user.id,

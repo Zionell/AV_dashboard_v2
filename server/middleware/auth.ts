@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 export default defineEventHandler(async (event) => {
     const path = event.path;
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
     const { user: sessionUser } = await requireUserSession(event);
 
-    const user = await dbClient.user.findUnique({
+    const user = await prisma.user.findUnique({
         where: { id: sessionUser.id },
         select: { id: true, email: true, role: true, companyId: true },
     });

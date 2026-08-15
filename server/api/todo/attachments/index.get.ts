@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import type { ITaskAttachment } from '#shared/types/todo';
 
 export default defineEventHandler(async (event): Promise<ITaskAttachment[]> => {
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event): Promise<ITaskAttachment[]> => {
 
         // select без `data`: содержимое отдаётся поштучно через /api/todo/attachments/[id],
         // иначе открытие задачи с несколькими картинками тянет мегабайты base64.
-        return await dbClient.todoAttachment.findMany({
+        return await prisma.todoAttachment.findMany({
             where: { todoId },
             select: {
                 id: true,

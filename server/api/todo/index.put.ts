@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { ETodoStatus } from '#shared/types/times';
 import { ETaskPriority } from '#shared/types/todo';
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
         }
 
         if (body.executorId) {
-            const executor = await dbClient.user.findFirst({
+            const executor = await prisma.user.findFirst({
                 where: { id: body.executorId, companyId: requireCompanyId(event) },
                 select: { id: true },
             });
@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
         }
 
         // projectScope: owner — вся компания, manager/employee — только свои проекты.
-        const existing = await dbClient.todo.findFirst({
+        const existing = await prisma.todo.findFirst({
             where: {
                 id,
                 project: projectScope(event),
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
         if (!existing) throw createError({ statusCode: 404, message: 'Task not found' });
 
-        await dbClient.todo.update({
+        await prisma.todo.update({
             where: { id: existing.id },
             data: {
                 ...body,

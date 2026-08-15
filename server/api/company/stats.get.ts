@@ -1,5 +1,5 @@
 import { startOfDay, startOfWeek, startOfMonth, subDays, subWeeks, subMonths } from 'date-fns';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import type { ICompanyStats, ICompanyProjectStat } from '#shared/types/company';
 
@@ -17,11 +17,11 @@ export default defineEventHandler(async (event): Promise<ICompanyStats> => {
         const lastMonthStart = startOfMonth(subMonths(now, 1));
 
         const [members, projects] = await Promise.all([
-            dbClient.user.findMany({
+            prisma.user.findMany({
                 where: { companyId },
                 select: { id: true, role: true, createdAt: true },
             }),
-            dbClient.project.findMany({
+            prisma.project.findMany({
                 where: { companyId },
                 select: {
                     id: true,
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event): Promise<ICompanyStats> => {
         const memberIds = members.map((m) => m.id);
 
         // Все сессии с начала прошлого месяца — самая ранняя нужная граница.
-        const times = await dbClient.times.findMany({
+        const times = await prisma.times.findMany({
             where: {
                 userId: { in: memberIds },
                 createdAt: { gte: lastMonthStart },

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { ECompanyPlan } from '#shared/types/company';
 
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
     const { user: sessionUser } = await requireUserSession(event);
     const body = await readValidatedBody(event, bodySchema.parse);
 
-    const current = await dbClient.user.findUnique({
+    const current = await prisma.user.findUnique({
         where: { id: sessionUser.id },
     });
 
@@ -24,11 +24,11 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 400, message: 'Onboarding is already complete' });
     }
 
-    const company = await dbClient.company.create({
+    const company = await prisma.company.create({
         data: { name: body.companyName, plan: body.plan },
     });
 
-    const updated = await dbClient.user.update({
+    const updated = await prisma.user.update({
         where: { id: current.id },
         data: {
             name: body.name,

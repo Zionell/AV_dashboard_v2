@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 const bodySchema = z.object({
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
         const id = getRouterParam(event, 'id');
         const { role } = await readValidatedBody(event, bodySchema.parse);
 
-        const target = await dbClient.user.findFirst({
+        const target = await prisma.user.findFirst({
             where: { id, companyId },
             select: { id: true, role: true },
         });
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
 
         // Нельзя оставить компанию без владельца.
         if (target.role === EUserRole.OWNER && role !== EUserRole.OWNER) {
-            const owners = await dbClient.user.count({
+            const owners = await prisma.user.count({
                 where: { companyId, role: EUserRole.OWNER },
             });
 
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-        const updated = await dbClient.user.update({
+        const updated = await prisma.user.update({
             where: { id: target.id },
             data: { role },
             select: { id: true, name: true, email: true, role: true },

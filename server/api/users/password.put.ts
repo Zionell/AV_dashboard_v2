@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 const bodySchema = z.object({
     current: z.string().optional(),
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
         const sessionUser = requireApiUser(event);
         const body = await readValidatedBody(event, bodySchema.parse);
 
-        const user = await dbClient.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 id: sessionUser.id,
             },
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
 
         const newHash = await bcrypt.hash(body.new, 10);
 
-        await dbClient.user.update({
+        await prisma.user.update({
             where: {
                 id: user.id,
             },

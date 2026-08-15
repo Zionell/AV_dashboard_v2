@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 export default defineEventHandler(async (event) => {
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
         const companyId = requireCompanyId(event);
         const id = getRouterParam(event, 'id');
 
-        const { count } = await dbClient.project.deleteMany({
+        const { count } = await prisma.project.deleteMany({
             where: { id, companyId },
         });
 

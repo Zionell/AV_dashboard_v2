@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 // Справочник категорий своей компании. Без скоупа эндпоинт отдавал категории всех компаний.
 export default defineEventHandler(async (event) => {
@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
         const { search }: { search?: string } = getQuery(event);
 
-        const categories = await dbClient.materialCategory.findMany({
+        const categories = await prisma.materialCategory.findMany({
             where: {
                 companyId,
                 // Поиск без учёта регистра — как в остальных списках.

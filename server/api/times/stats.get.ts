@@ -1,5 +1,5 @@
 import { eachDayOfInterval, endOfDay, format, startOfDay, subDays } from 'date-fns';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { ETodoStatus, type ITimesStats } from '#shared/types/times';
 
@@ -13,7 +13,7 @@ interface IQuery {
 /** Пользователи, чьё время доступно текущему юзеру: owner — компания, manager — участники его проектов, employee — только он сам. */
 async function allowedUserIds(userId: string, role: string, companyId: string): Promise<string[]> {
     if (role === EUserRole.OWNER) {
-        const users = await dbClient.user.findMany({
+        const users = await prisma.user.findMany({
             where: { companyId },
             select: { id: true },
         });
@@ -22,11 +22,11 @@ async function allowedUserIds(userId: string, role: string, companyId: string): 
     }
 
     if (role === EUserRole.MANAGER) {
-        const own = await dbClient.usersOnProjects.findMany({
+        const own = await prisma.usersOnProjects.findMany({
             where: { userId },
             select: { projectId: true },
         });
-        const links = await dbClient.usersOnProjects.findMany({
+        const links = await prisma.usersOnProjects.findMany({
             where: { projectId: { in: own.map((p) => p.projectId) } },
             select: { userId: true },
         });
@@ -69,7 +69,7 @@ export default defineEventHandler(async (event): Promise<ITimesStats> => {
             await requireProjectMembership(event, query.projectId);
         }
 
-        const sessions = await dbClient.times.findMany({
+        const sessions = await prisma.times.findMany({
             where: {
                 userId: { in: targetIds },
                 createdAt: { gte: from, lte: to },

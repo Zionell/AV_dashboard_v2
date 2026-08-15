@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { COMPANY_PLANS, ECompanyPlan, type ICompanyPlanState } from '#shared/types/company';
 import { formatBytes } from '#shared/utils/format';
@@ -41,7 +41,7 @@ export default defineEventHandler(async (event): Promise<ICompanyPlanState> => {
             });
         }
 
-        await dbClient.company.update({ where: { id: companyId }, data: { plan } });
+        await prisma.company.update({ where: { id: companyId }, data: { plan } });
 
         return await getCompanyPlanState(companyId);
     } catch (e) {

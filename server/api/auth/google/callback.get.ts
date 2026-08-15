@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 
 const STATE_COOKIE = 'oauth_state';
 
@@ -8,12 +8,12 @@ const googleHandler = defineOAuthGoogleEventHandler({
         scope: ['openid', 'email', 'profile'],
     },
     async onSuccess(event, { user: googleUser }) {
-        let user = await dbClient.user.findUnique({
+        let user = await prisma.user.findUnique({
             where: { email: googleUser.email },
         });
 
         if (!user) {
-            user = await dbClient.user.create({
+            user = await prisma.user.create({
                 data: {
                     email: googleUser.email,
                     name: googleUser.name ?? googleUser.email.split('@')[0] ?? '',

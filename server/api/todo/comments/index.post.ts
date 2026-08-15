@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EProjectEventType } from '#shared/types/projects';
 
 const bodySchema = z.object({
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
 
         const todo = await requireTodoInScope(event, body.todoId);
 
-        const comment = await dbClient.todoComment.create({
+        const comment = await prisma.todoComment.create({
             data: {
                 text: body.text,
                 todoId: body.todoId,

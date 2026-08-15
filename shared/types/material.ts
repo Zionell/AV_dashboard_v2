@@ -1,6 +1,6 @@
-import type { Material, MaterialCategory } from '~~/prisma/generated/prisma';
+import type { Material, MaterialCategory } from '~~/prisma/generated/prisma/client';
 
-export interface IMaterial extends Material {
+interface IMaterial extends Material {
     category: MaterialCategory;
 }
 

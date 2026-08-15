@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import type { ITaskCard, TaskSortKey } from '#shared/types/todo';
 import type { ETodoStatus } from '#shared/types/times';
 
@@ -52,20 +52,20 @@ export default defineEventHandler(async (event): Promise<{ results: ITaskCard[];
             project: { select: { id: true, name: true } },
         };
 
-        const count = await dbClient.todo.count({ where });
-        const items = await dbClient.todo.findMany({ where, include, orderBy, take, skip });
+        const count = await prisma.todo.count({ where });
+        const items = await prisma.todo.findMany({ where, include, orderBy, take, skip });
 
         const ids = items.map((t) => t.id);
 
         // Залогированное время по задачам страницы.
         const now = Date.now();
         const [sessions, commentGroups, attachmentGroups] = await Promise.all([
-            dbClient.times.findMany({
+            prisma.times.findMany({
                 where: { todoId: { in: ids } },
                 select: { todoId: true, active: true, createdAt: true, updatedAt: true },
             }),
-            dbClient.todoComment.groupBy({ by: ['todoId'], where: { todoId: { in: ids } }, _count: { _all: true } }),
-            dbClient.todoAttachment.groupBy({ by: ['todoId'], where: { todoId: { in: ids } }, _count: { _all: true } }),
+            prisma.todoComment.groupBy({ by: ['todoId'], where: { todoId: { in: ids } }, _count: { _all: true } }),
+            prisma.todoAttachment.groupBy({ by: ['todoId'], where: { todoId: { in: ids } }, _count: { _all: true } }),
         ]);
         const loggedByTodo: Record<string, number> = {};
 

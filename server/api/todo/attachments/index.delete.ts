@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 // Удаление вложений — только owner/manager (в рамках своих проектов).
@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
         const { id } = getQuery<{ id?: string }>(event);
 
         const attachment = id
-            ? await dbClient.todoAttachment.findFirst({
+            ? await prisma.todoAttachment.findFirst({
                   where: { id, todo: { project: projectScope(event) } },
                   select: { id: true },
               })
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
         if (!attachment) throw createError({ statusCode: 404, message: 'Attachment not found' });
 
-        await dbClient.todoAttachment.delete({ where: { id: attachment.id } });
+        await prisma.todoAttachment.delete({ where: { id: attachment.id } });
 
         setResponseStatus(event, 204);
     } catch (e) {

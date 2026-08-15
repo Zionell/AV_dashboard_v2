@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 
 const bodySchema = z.object({
@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
         await requireCategoryInScope(event, body.categoryId);
 
-        const material = await dbClient.material.create({
+        const material = await prisma.material.create({
             data: {
                 name: body.name,
                 description: body.description ?? '',

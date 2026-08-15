@@ -1,4 +1,4 @@
-import { dbClient } from '~~/lib/dbClient';
+import { prisma } from '~~/server/utils/prisma';
 import { EUserRole } from '#shared/types/user';
 import { EProjectEventType } from '#shared/types/projects';
 
@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
         const user = requireRole(event, EUserRole.OWNER, EUserRole.MANAGER);
         const { id }: { id: string } = getQuery(event);
 
-        const existing = await dbClient.todo.findFirst({
+        const existing = await prisma.todo.findFirst({
             where: {
                 id,
                 project: projectScope(event),
@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
 
         if (!existing) throw createError({ statusCode: 404, message: 'Task not found' });
 
-        await dbClient.todo.delete({ where: { id: existing.id } });
+        await prisma.todo.delete({ where: { id: existing.id } });
 
         recordEvent(event, {
             type: EProjectEventType.TASK_DELETED,

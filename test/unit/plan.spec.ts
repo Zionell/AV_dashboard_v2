@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ECompanyPlan, COMPANY_PLANS } from '#shared/types/company';
 
-vi.mock('~~/lib/dbClient', () => ({
-    dbClient: {
+vi.mock('~~/server/utils/prisma', () => ({
+    prisma: {
         company: { findUnique: vi.fn() },
         user: { count: vi.fn() },
         project: { count: vi.fn() },
@@ -10,11 +10,11 @@ vi.mock('~~/lib/dbClient', () => ({
     },
 }));
 
-const { dbClient } = await import('~~/lib/dbClient');
+const { prisma } = await import('~~/server/utils/prisma');
 const { toPlan, planLimits, getCompanyPlanState, assertStorageQuota, assertSeatAvailable, assertProjectAvailable } =
     await import('~~/server/utils/plan');
 
-const db = dbClient as unknown as {
+const db = prisma as unknown as {
     company: { findUnique: ReturnType<typeof vi.fn> };
     user: { count: ReturnType<typeof vi.fn> };
     project: { count: ReturnType<typeof vi.fn> };
