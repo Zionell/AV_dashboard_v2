@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 
 const isLoading = ref(false);
 const errorMsg = ref('');
@@ -297,6 +298,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 :to="project ? `${ERoutes.PROJECTS}/${project.id}` : ERoutes.PROJECTS"
             />
             <UButton
+                v-bind="readonlyAttrs"
                 type="submit"
                 :loading="isLoading"
                 :label="project ? 'Save' : 'Create'"

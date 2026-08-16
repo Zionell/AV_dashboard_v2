@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const timeStore = useTimesStore();
+const { isReadonly, readonlyAttrs } = useReadonly();
 
 const todoId = ref<string | undefined>();
 
@@ -44,10 +45,12 @@ function toggle() {
                 </transition>
 
                 <UButton
+                    :title="readonlyAttrs.title"
+                    :style="readonlyAttrs.style"
                     size="xl"
                     square
                     :loading="timeStore.isLoading"
-                    :disabled="!timeStore.isActive && !selectedTodo"
+                    :disabled="isReadonly || (!timeStore.isActive && !selectedTodo)"
                     @click="toggle"
                 >
                     <transition

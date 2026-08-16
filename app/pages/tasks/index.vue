@@ -3,6 +3,7 @@ import type { ETodoStatus } from '#shared/types/times';
 import type { ETaskPriority, ITaskCard, TaskSortKey } from '#shared/types/todo';
 
 const userStore = useUserStore();
+const { readonlyAttrs } = useReadonly();
 
 const modalRef = useTemplateRef('modalRef');
 
@@ -25,7 +26,7 @@ watch([q, projectId, executorId, authorId, priority, sort, view], () => {
     page.value = 1;
 });
 
-const { data, refresh } = await useFetch<{ results: ITaskCard[]; count: number }>('/api/todo', {
+const { data, refresh, status } = await useFetch<{ results: ITaskCard[]; count: number }>('/api/todo', {
     query: {
         q,
         projectId,
@@ -37,6 +38,10 @@ const { data, refresh } = await useFetch<{ results: ITaskCard[]; count: number }
         skip,
     },
 });
+
+// Пока летит запрос, useFetch держит прошлый результат — без этого флага смена фильтра
+// выглядела бы как «ничего не произошло», а потом список молча подменялся бы.
+const isFiltering = computed((): boolean => status.value === 'pending');
 
 const tasks = computed((): ITaskCard[] => data.value?.results || []);
 
@@ -69,6 +74,7 @@ function handleEdit(task: ITaskCard) {
                 <template #right>
                     <UButton
                         v-if="userStore.canManageContent"
+                        v-bind="readonlyAttrs"
                         icon="i-lucide-plus"
                         label="Create Task"
                         @click="handleCreate()"
@@ -106,15 +112,19 @@ function handleEdit(task: ITaskCard) {
                     v-if="view === 'kanban'"
                     :tasks="tasks"
                     :can-create="userStore.canManageContent"
+                    :is-loading="isFiltering"
                     @open="openDetail"
                     @create="handleCreate"
                     @refresh="refresh"
                 />
 
                 <template v-else>
+                    <!-- Во время запроса показываем список с лоадером, а не пустое состояние:
+                         иначе между фильтрами мигало бы «No tasks found». -->
                     <TasksList
-                        v-if="tasks.length"
+                        v-if="isFiltering || tasks.length"
                         :tasks="tasks"
+                        :is-loading="isFiltering"
                         @open="openDetail"
                     />
                     <UEmpty
@@ -130,6 +140,7 @@ function handleEdit(task: ITaskCard) {
                                           icon: 'i-lucide-plus',
                                           label: 'Create Task',
                                           onClick: () => handleCreate(),
+                                          ...readonlyAttrs,
                                       },
                                   ]
                                 : []

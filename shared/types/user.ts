@@ -2,7 +2,15 @@ export enum EUserRole {
     OWNER = 'OWNER',
     MANAGER = 'MANAGER',
     EMPLOYEE = 'EMPLOYEE',
+    /**
+     * Демо-витрина: видит продукт целиком, как владелец, но не может записать
+     * ни байта. Роль не назначается через интерфейс — только вручную в базе.
+     */
+    TEST = 'TEST',
 }
+
+/** Роли, которые можно выдать участнику в интерфейсе. TEST сюда не входит. */
+export const ASSIGNABLE_ROLES = [EUserRole.OWNER, EUserRole.MANAGER, EUserRole.EMPLOYEE] as const;
 
 export interface IUserSpec {
     id: string;

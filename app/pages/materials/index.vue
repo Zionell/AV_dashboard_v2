@@ -3,6 +3,7 @@ import { EViewType, type IPaginatedResponse } from '#shared/types';
 import type { IMaterialCard, MaterialSortKey } from '#shared/types/material';
 
 const userStore = useUserStore();
+const { readonlyAttrs } = useReadonly();
 const route = useRoute();
 
 const take = 24;
@@ -48,6 +49,7 @@ function handleCreate() {
                 <template #right>
                     <UButton
                         v-if="userStore.canManageContent"
+                        v-bind="readonlyAttrs"
                         icon="i-lucide-plus"
                         label="Create new"
                         @click="handleCreate"
@@ -106,6 +108,7 @@ function handleCreate() {
                                       icon: 'i-lucide-plus',
                                       label: 'Create new',
                                       onClick: handleCreate,
+                                      ...readonlyAttrs,
                                   },
                               ]
                             : []

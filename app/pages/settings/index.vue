@@ -5,6 +5,7 @@ import { toBase64 } from '~/assets/ts/files';
 const { $csrfFetch } = useNuxtApp();
 const userStore = useUserStore();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 const fileRef = useTemplateRef<HTMLInputElement>('fileRef');
 const isLoading = ref(false);
 
@@ -80,6 +81,7 @@ function onFileClick() {
             class="mb-4"
         >
             <UButton
+                v-bind="readonlyAttrs"
                 form="settings"
                 label="Save changes"
                 :loading="isLoading"
@@ -133,6 +135,7 @@ function onFileClick() {
                         size="lg"
                     />
                     <UButton
+                        v-bind="readonlyAttrs"
                         label="Choose"
                         variant="outline"
                         @click="onFileClick"

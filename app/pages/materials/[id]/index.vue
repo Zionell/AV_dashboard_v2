@@ -7,6 +7,7 @@ const router = useRouter();
 const userStore = useUserStore();
 const toast = useToast();
 const { $csrfFetch } = useNuxtApp();
+const { isReadonly, readonlyAttrs } = useReadonly();
 
 const { data: material, error } = await useFetch<IMaterialCard>(`/api/materials/${route.params.id}`);
 
@@ -76,13 +77,15 @@ async function remove() {
                 <template #right>
                     <template v-if="userStore.canManageContent">
                         <UButton
+                            v-bind="readonlyAttrs"
                             icon="i-lucide-pencil"
                             label="Edit"
                             variant="outline"
                             color="neutral"
-                            :to="`${ERoutes.MATERIALS}/${material?.id}/edit`"
+                            :to="isReadonly ? undefined : `${ERoutes.MATERIALS}/${material?.id}/edit`"
                         />
                         <UButton
+                            v-bind="readonlyAttrs"
                             icon="i-lucide-trash"
                             color="error"
                             variant="ghost"

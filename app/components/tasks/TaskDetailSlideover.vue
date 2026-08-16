@@ -17,6 +17,7 @@ const emit = defineEmits<{
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
 const userStore = useUserStore();
+const { readonlyAttrs } = useReadonly();
 const isRemoving = ref(false);
 
 const statusItems = [
@@ -113,6 +114,7 @@ function handleEdit() {
                 <UFormField label="Status">
                     <USelect
                         v-model="status"
+                        v-bind="readonlyAttrs"
                         :items="statusItems"
                         class="w-full"
                         @update:model-value="onStatusChange($event as ETodoStatus)"
@@ -184,6 +186,7 @@ function handleEdit() {
         >
             <div class="flex items-center justify-between w-full gap-3">
                 <UButton
+                    v-bind="readonlyAttrs"
                     label="Edit task"
                     variant="outline"
                     color="neutral"
@@ -191,6 +194,7 @@ function handleEdit() {
                     @click="handleEdit"
                 />
                 <UButton
+                    v-bind="readonlyAttrs"
                     label="Delete task"
                     color="error"
                     variant="outline"

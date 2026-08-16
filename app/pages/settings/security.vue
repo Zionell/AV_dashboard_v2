@@ -6,6 +6,7 @@ import { capitalizeFirstLetter } from '~/assets/ts/text';
 const { $csrfFetch } = useNuxtApp();
 const userStore = useUserStore();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 const isLoading = ref(false);
 const isDeleting = ref(false);
 
@@ -128,6 +129,7 @@ async function handleDelete() {
             </UFormField>
 
             <UButton
+                v-bind="readonlyAttrs"
                 label="Update"
                 class="w-fit"
                 type="submit"
@@ -143,6 +145,7 @@ async function handleDelete() {
     >
         <template #footer>
             <UButton
+                v-bind="readonlyAttrs"
                 label="Delete account"
                 color="error"
                 :loading="isDeleting"

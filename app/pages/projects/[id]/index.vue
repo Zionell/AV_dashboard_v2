@@ -7,6 +7,7 @@ const route = useRoute();
 const router = useRouter();
 const toast = useToast();
 const userStore = useUserStore();
+const { isReadonly, readonlyAttrs } = useReadonly();
 const isLoading = ref(false);
 
 const { data: project, error } = await useFetch<IProjectDetail>(`/api/projects/${route.params.id}`, {
@@ -83,13 +84,15 @@ function handleBack() {
                 <template #right>
                     <UButton
                         v-if="userStore.canManageContent"
+                        v-bind="readonlyAttrs"
                         label="Edit Project"
                         variant="outline"
                         color="neutral"
-                        :to="`${ERoutes.PROJECTS}/${route.params.id}/edit`"
+                        :to="isReadonly ? undefined : `${ERoutes.PROJECTS}/${route.params.id}/edit`"
                     />
                     <UButton
                         v-if="userStore.isOwner"
+                        v-bind="readonlyAttrs"
                         color="error"
                         variant="outline"
                         :loading="isLoading"

@@ -10,6 +10,7 @@ const emit = defineEmits<{
 
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 
 const isOpen = ref(false);
 const isLoading = ref(false);
@@ -271,6 +272,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                         @click="close"
                     />
                     <UButton
+                        v-bind="readonlyAttrs"
                         type="submit"
                         :label="editingId ? 'Save' : 'Create'"
                         :loading="isLoading"

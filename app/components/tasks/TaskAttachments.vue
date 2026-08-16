@@ -14,6 +14,7 @@ const emit = defineEmits<{
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
 const userStore = useUserStore();
+const { isReadonly, readonlyAttrs } = useReadonly();
 
 const attachments = ref<ITaskAttachment[]>([]);
 const isLoading = ref(false);
@@ -136,12 +137,14 @@ async function openPreview(attachment: ITaskAttachment) {
         <div class="flex items-center justify-between gap-2">
             <h4 class="text-sm font-semibold text-highlighted">Attachments ({{ attachments.length }})</h4>
             <UButton
+                :title="readonlyAttrs.title"
+                :style="readonlyAttrs.style"
                 :label="atLimit ? `Max ${MAX_ATTACHMENTS_PER_TASK} files` : 'Add image'"
                 icon="i-lucide-paperclip"
                 variant="ghost"
                 size="xs"
                 :loading="isUploading"
-                :disabled="atLimit"
+                :disabled="isReadonly || atLimit"
                 @click="fileInput?.click()"
             />
             <input
@@ -177,6 +180,7 @@ async function openPreview(attachment: ITaskAttachment) {
                 </button>
                 <UButton
                     v-if="userStore.canManageContent"
+                    v-bind="readonlyAttrs"
                     icon="i-lucide-x"
                     color="error"
                     size="xs"

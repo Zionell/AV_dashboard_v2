@@ -29,6 +29,24 @@ export function hasRole(user: Pick<ApiUser, 'role'>, ...roles: EUserRole[]): boo
     return roles.includes(user.role as EUserRole);
 }
 
+/** Роль без права записи. Сейчас такая одна — демо-витрина. */
+export function isReadonlyRole(role: string): boolean {
+    return role === EUserRole.TEST;
+}
+
+/**
+ * Роль, по которой считаются права на чтение. TEST читает как владелец — демо
+ * должно показывать продукт целиком. Запись у него отсекается отдельно и раньше,
+ * по методу запроса в серверном middleware, поэтому подмена ничего не открывает.
+ *
+ * Подмена живёт только в `event.context.user`; `/api/users/me` читает пользователя
+ * из базы напрямую и отдаёт клиенту настоящую роль — по ней интерфейс и понимает,
+ * что находится в режиме просмотра.
+ */
+export function effectiveRole(role: string): string {
+    return isReadonlyRole(role) ? EUserRole.OWNER : role;
+}
+
 export function requireRole(event: H3Event, ...roles: EUserRole[]): ApiUser {
     const user = requireApiUser(event);
 

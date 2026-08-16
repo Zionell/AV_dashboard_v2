@@ -13,6 +13,7 @@ const emit = defineEmits<{
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
 const userStore = useUserStore();
+const { isReadonly, readonlyAttrs } = useReadonly();
 
 const comments = ref<ITaskComment[]>([]);
 const isLoading = ref(false);
@@ -142,6 +143,7 @@ function formatDate(value: Date | string) {
                         class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition"
                     >
                         <UButton
+                            v-bind="readonlyAttrs"
                             icon="i-lucide-pencil"
                             variant="ghost"
                             color="neutral"
@@ -149,6 +151,7 @@ function formatDate(value: Date | string) {
                             @click="startEdit(comment)"
                         />
                         <UButton
+                            v-bind="readonlyAttrs"
                             icon="i-lucide-trash"
                             variant="ghost"
                             color="error"
@@ -198,18 +201,21 @@ function formatDate(value: Date | string) {
         <div class="grid gap-2">
             <UTextarea
                 v-model="newText"
+                v-bind="readonlyAttrs"
                 placeholder="Write a comment…"
                 :rows="2"
                 autoresize
                 class="w-full"
             />
             <UButton
+                :title="readonlyAttrs.title"
+                :style="readonlyAttrs.style"
                 label="Comment"
                 icon="i-lucide-send"
                 size="sm"
                 class="justify-self-end"
                 :loading="isSending"
-                :disabled="!newText.trim()"
+                :disabled="isReadonly || !newText.trim()"
                 @click="send"
             />
         </div>

@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { prisma } from '~~/server/utils/prisma';
-import { EUserRole } from '#shared/types/user';
+import { ASSIGNABLE_ROLES, EUserRole } from '#shared/types/user';
 
+// Список ролей общий с интерфейсом: демо-роль TEST выдать нельзя ни отсюда, ни оттуда.
 const bodySchema = z.object({
-    role: z.enum([EUserRole.OWNER, EUserRole.MANAGER, EUserRole.EMPLOYEE]),
+    role: z.enum(ASSIGNABLE_ROLES),
 });
 
 export default defineEventHandler(async (event) => {

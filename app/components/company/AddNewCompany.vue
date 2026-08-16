@@ -5,6 +5,7 @@ import type { FormSubmitEvent } from '@nuxt/ui';
 const { $csrfFetch } = useNuxtApp();
 const userStore = useUserStore();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 const emit = defineEmits(['refresh']);
 
 const schema = z.object({
@@ -53,6 +54,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         title="New company"
     >
         <UButton
+            v-bind="readonlyAttrs"
             label="Add new company"
             size="lg"
         />
@@ -84,6 +86,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                         @click="void (isOpen = false)"
                     />
                     <UButton
+                        v-bind="readonlyAttrs"
                         label="Save"
                         size="lg"
                         block

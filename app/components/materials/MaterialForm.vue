@@ -10,6 +10,7 @@ const props = defineProps<{
 
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 
 const isLoading = ref(false);
 const errorMsg = ref('');
@@ -181,6 +182,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                 :to="ERoutes.MATERIALS"
             />
             <UButton
+                v-bind="readonlyAttrs"
                 type="submit"
                 :loading="isLoading"
                 :label="material ? 'Save' : 'Create'"

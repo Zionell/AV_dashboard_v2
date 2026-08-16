@@ -22,6 +22,8 @@ const {
     requireTodoInScope,
     requireCategoryInScope,
     projectScope,
+    isReadonlyRole,
+    effectiveRole,
 } = await import('~~/server/utils/access');
 
 const db = prisma as unknown as {
@@ -92,6 +94,33 @@ describe('роли', () => {
         expect(() => requireRole(eventAs({ role: EUserRole.EMPLOYEE }), EUserRole.OWNER)).toThrowError(
             expect.objectContaining({ statusCode: 403 })
         );
+    });
+});
+
+describe('роль только для чтения', () => {
+    it.each([
+        [EUserRole.TEST, true],
+        [EUserRole.OWNER, false],
+        [EUserRole.MANAGER, false],
+        [EUserRole.EMPLOYEE, false],
+    ])('isReadonlyRole(%s) === %s', (role, expected) => {
+        expect(isReadonlyRole(role)).toBe(expected);
+    });
+
+    it('TEST читает как владелец', () => {
+        expect(effectiveRole(EUserRole.TEST)).toBe(EUserRole.OWNER);
+    });
+
+    it.each([EUserRole.OWNER, EUserRole.MANAGER, EUserRole.EMPLOYEE])('%s остаётся собой', (role) => {
+        expect(effectiveRole(role)).toBe(role);
+    });
+
+    // Подменённая роль обязана давать TEST владельческий скоуп на чтение —
+    // ради этого подмена и существует.
+    it('с подменённой ролью projectScope отдаёт всю компанию', () => {
+        expect(projectScope(eventAs({ role: effectiveRole(EUserRole.TEST) as EUserRole, companyId: 'c1' }))).toEqual({
+            companyId: 'c1',
+        });
     });
 });
 

@@ -5,7 +5,9 @@ definePageMeta({
         function () {
             const userStore = useUserStore();
 
-            if (!userStore.canManageContent) {
+            // Демо-роль сюда не пускаем: форма ей всё равно недоступна на отправку,
+            // а пустая страница создания в витрине только сбивает с толку.
+            if (!userStore.canManageContent || userStore.isReadonly) {
                 return navigateTo(ERoutes.PROJECTS);
             }
         },

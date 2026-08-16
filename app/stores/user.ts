@@ -10,7 +10,22 @@ export const useUserStore = defineStore('user', () => {
         user: null,
     });
 
-    const isOwner = computed((): boolean => state.user?.role === EUserRole.OWNER);
+    /**
+     * Демо-витрина. Роль приходит настоящей: `/api/users/me` читает пользователя из базы,
+     * минуя подмену роли, которую сервер делает для проверки прав на чтение.
+     */
+    const isTest = computed((): boolean => state.user?.role === EUserRole.TEST);
+
+    /**
+     * Режим просмотра: вёрстка рендерится целиком, но всё, что пишет в базу, — неактивно.
+     * Настоящий запрет живёт на сервере; здесь только внешний вид.
+     */
+    const isReadonly = isTest;
+
+    // TEST видит интерфейс как владелец — иначе демо показывало бы урезанный продукт.
+    // Благодаря этому все существующие v-if по ролям работают без изменений, а неактивными
+    // контролы делает уже isReadonly.
+    const isOwner = computed((): boolean => state.user?.role === EUserRole.OWNER || isTest.value);
     const isManager = computed((): boolean => state.user?.role === EUserRole.MANAGER);
     const isEmployee = computed((): boolean => state.user?.role === EUserRole.EMPLOYEE);
     const canManageContent = computed((): boolean => isOwner.value || isManager.value);
@@ -40,6 +55,8 @@ export const useUserStore = defineStore('user', () => {
         isOwner,
         isManager,
         isEmployee,
+        isTest,
+        isReadonly,
         canManageContent,
         fetchUser,
         updateUser,

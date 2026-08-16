@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { format, isToday, isYesterday } from 'date-fns';
 import type { IMember } from '#shared/types/user';
+import { ASSIGNABLE_ROLES } from '#shared/types/user';
 import type { IPaginatedResponse } from '#shared/types';
 
 const userStore = useUserStore();
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 
 const take = 10;
 const page = ref(1);
@@ -22,7 +24,8 @@ const { data, refresh } = await useFetch<IPaginatedResponse<IMember>>('/api/user
 
 // Смена ролей и удаление участников — только owner; менеджер видит список.
 const canEditMembers = computed<boolean>(() => userStore.isOwner);
-const roles = Object.keys(EUserRole);
+// Демо-роль TEST в выпадающем списке не нужна — её выдают только вручную в базе.
+const roles = [...ASSIGNABLE_ROLES];
 
 function isSelf(id: string) {
     return userStore.user?.id === id;
@@ -133,6 +136,7 @@ async function removeMember(user: IMember) {
                         <td class="py-3 px-4">
                             <USelect
                                 v-if="canEditMembers"
+                                v-bind="readonlyAttrs"
                                 :model-value="user.role"
                                 :items="roles"
                                 color="neutral"
@@ -160,6 +164,7 @@ async function removeMember(user: IMember) {
                                 text="Remove employee"
                             >
                                 <UButton
+                                    v-bind="readonlyAttrs"
                                     icon="i-lucide-trash"
                                     color="error"
                                     variant="ghost"

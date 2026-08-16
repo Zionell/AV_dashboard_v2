@@ -5,6 +5,7 @@ import { WORK_DAY_HOURS } from '#shared/constants';
 
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { readonlyAttrs } = useReadonly();
 
 const isOpen = ref(false);
 const isLoading = ref(false);
@@ -55,6 +56,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         description="Invite a colleague to your company by email."
     >
         <UButton
+            v-bind="readonlyAttrs"
             icon="i-lucide-user-plus"
             label="Invite people"
         />
@@ -113,6 +115,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
                         @click="close"
                     />
                     <UButton
+                        v-bind="readonlyAttrs"
                         type="submit"
                         label="Send invite"
                         icon="i-lucide-send"

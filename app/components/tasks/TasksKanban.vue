@@ -6,6 +6,7 @@ import type { ITaskCard } from '#shared/types/todo';
 const props = defineProps<{
     tasks: ITaskCard[];
     canCreate: boolean;
+    isLoading?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -16,6 +17,7 @@ const emit = defineEmits<{
 
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { isReadonly, readonlyAttrs } = useReadonly();
 
 const COLUMNS = [
     { status: ETodoStatus.TODO, label: 'Todo', dot: 'bg-neutral-400' },
@@ -89,6 +91,7 @@ async function onChange(event: IDragChange, status: ETodoStatus) {
 
                 <UButton
                     v-if="canCreate"
+                    v-bind="readonlyAttrs"
                     icon="i-lucide-plus"
                     variant="ghost"
                     color="neutral"
@@ -98,15 +101,25 @@ async function onChange(event: IDragChange, status: ETodoStatus) {
                 />
             </div>
 
+            <!-- Лоадер вместо карточек: колонка сохраняет высоту, поэтому доска не прыгает. -->
+            <div
+                v-if="props.isLoading"
+                class="grid place-items-center min-h-32 p-2 pt-0"
+            >
+                <Preloader />
+            </div>
+
             <draggable
+                v-else
                 v-model="columns[col.status]"
                 group="tasks"
                 item-key="id"
+                :disabled="isReadonly"
                 :animation="200"
                 :force-fallback="true"
                 ghost-class="opacity-40"
-                fallback-class="rotate-2 shadow-xl"
-                class="grid gap-2 p-2 pt-0 min-h-32"
+                :fallback-class="$style.dragFallback"
+                class="grid gap-2 p-2 pt-0 min-h-32 select-none"
                 @change="onChange($event, col.status)"
             >
                 <!-- div-обёртка в #item обязательна: UPageCard (корень TaskCard) не пробрасывает
@@ -134,6 +147,7 @@ async function onChange(event: IDragChange, status: ETodoStatus) {
                         <p class="text-xs">Create a new task<br />or drag one here.</p>
                         <UButton
                             v-if="canCreate"
+                            v-bind="readonlyAttrs"
                             label="Create Task"
                             variant="outline"
                             color="neutral"
@@ -146,3 +160,17 @@ async function onChange(event: IDragChange, status: ETodoStatus) {
         </div>
     </div>
 </template>
+
+<style module>
+/*
+ * Вид карточки, которую тащат. Именно один класс, а не утилиты Tailwind через пробел:
+ * SortableJS отдаёт fallbackClass в classList.add(), а тот бросает InvalidCharacterError
+ * на строке с пробелом — исключение срывало старт перетаскивания, и доска не работала.
+ */
+.dragFallback {
+    transform: rotate(2deg);
+    box-shadow:
+        0 20px 25px -5px rgb(0 0 0 / 0.3),
+        0 8px 10px -6px rgb(0 0 0 / 0.3);
+}
+</style>

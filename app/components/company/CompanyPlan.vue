@@ -4,6 +4,7 @@ import { formatBytes, planSummary } from '#shared/utils/format';
 
 const { $csrfFetch } = useNuxtApp();
 const toast = useToast();
+const { isReadonly, readonlyAttrs } = useReadonly();
 const userStore = useUserStore();
 
 const { data: state, refresh } = await useFetch<ICompanyPlanState | null>('/api/company/plan', {
@@ -90,7 +91,9 @@ async function save() {
             variant="outline"
             color="neutral"
             block
-            :disabled="!userStore.isOwner"
+            :title="readonlyAttrs.title"
+            :style="readonlyAttrs.style"
+            :disabled="!userStore.isOwner || isReadonly"
             @click="open"
         />
 
@@ -142,9 +145,11 @@ async function save() {
                             @click="close"
                         />
                         <UButton
+                            :title="readonlyAttrs.title"
+                            :style="readonlyAttrs.style"
                             label="Save plan"
                             :loading="isSaving"
-                            :disabled="selected === state.plan"
+                            :disabled="isReadonly || selected === state.plan"
                             @click="save"
                         />
                     </div>

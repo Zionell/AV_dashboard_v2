@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const userStore = useUserStore();
+const { isReadonly, readonlyAttrs } = useReadonly();
 
 const { data, error, status } = await useFetch<{ results: IProject[]; count: number }>('/api/projects', {
     query: {
@@ -36,10 +37,11 @@ function handleAddNew() {
                 <template #right>
                     <UButton
                         v-if="userStore.canManageContent"
+                        v-bind="readonlyAttrs"
                         icon="i-lucide-plus"
                         label="Create project"
                         size="lg"
-                        :to="`${ERoutes.PROJECTS}/new`"
+                        :to="isReadonly ? undefined : `${ERoutes.PROJECTS}/new`"
                     />
                 </template>
             </UDashboardToolbar>
@@ -78,6 +80,7 @@ function handleAddNew() {
                                   icon: 'i-lucide-plus',
                                   label: 'Create new',
                                   onClick: handleAddNew,
+                                  ...readonlyAttrs,
                               },
                           ]
                         : []
