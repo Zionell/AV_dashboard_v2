@@ -26,6 +26,5 @@ logs
 # VSC
 .history
 
-/app/generated
 /docs
 /plans
