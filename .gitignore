@@ -26,7 +26,6 @@ logs
 # VSC
 .history
 
-/generated/prisma
+/app/generated
 /docs
 /plans
-/prisma/generated

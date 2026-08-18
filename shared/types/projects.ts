@@ -1,4 +1,4 @@
-import type { Project } from '~~/prisma/generated/prisma/client';
+import type { Project } from '~/generated/prisma/client';
 import type { IUserShort } from '#shared/types/user';
 import type { ETodoStatus } from '#shared/types/times';
 

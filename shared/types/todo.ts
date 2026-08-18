@@ -1,4 +1,4 @@
-import type { Todo } from '~~/prisma/generated/prisma/client';
+import type { Todo } from '~/generated/prisma/client';
 import type { ETodoStatus } from '#shared/types/times';
 
 /**
