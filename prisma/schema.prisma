@@ -1,14 +1,6 @@
-// `prisma-client` вместо legacy `prisma-client-js`: тот копировал к себе CJS-рантайм с
-// `__dirname`, который Nitro инлайнил в ESM-бандл — прод падал с «__dirname is not
-// defined». Новый генератор импортирует `@prisma/client/runtime/library`, и в ESM-сборке
-// рантайма (`library.mjs`) `__dirname` объявлен самой Prisma.
-// importFileExtension = "ts": по умолчанию генератор пишет внутри себя импорты вида
-// `./enums.js`, которых на диске нет (файлы .ts). Vite это переживает, а голый node
-// в скриптах (`node --experimental-transform-types scripts/*.ts`) падает с
-// ERR_MODULE_NOT_FOUND. С «ts» пути совпадают с реальными файлами для обоих.
 generator client {
     provider            = "prisma-client"
-    output              = "./generated/prisma"
+    output              = "../app/generated/prisma"
     runtime             = "nodejs"
     moduleFormat        = "esm"
     importFileExtension = "ts"
@@ -30,13 +22,11 @@ model User {
     phone       String?
     role        String  @default("EMPLOYEE")
 
-    // Норма рабочего дня в часах — у каждого своя (задаётся при приглашении).
-    // Относительно неё считается переработка в times/stats и times/team.
     workHours Int @default(8)
 
     times           Times[]
     executor        Todo[]
-    authoredTodos   Todo[]           @relation("TodoAuthor")
+    authoredTodos   Todo[]            @relation("TodoAuthor")
     projects        UsersOnProjects[]
     materials       Material[]
     todoComments    TodoComment[]
@@ -68,8 +58,6 @@ model Company {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String
 
-    // Тариф: FREE | PRO | TEAM. Лимиты мест и хранилища — в COMPANY_PLANS
-    // (shared/types/company.ts), в БД держим только сам план.
     plan String @default("FREE")
 
     users              User[]
@@ -80,16 +68,11 @@ model Company {
     invitations        Invitation[]
 }
 
-// Приглашение в компанию. Живёт до принятия или истечения — без него приглашённому
-// негде взять компанию и заданную пригласившим норму часов.
 model Invitation {
     id    String @id @default(auto()) @map("_id") @db.ObjectId
     email String
-    // Секрет из ссылки в письме. Уникален, чтобы принять приглашение можно было один раз.
     token String @unique
 
-    // Норма рабочего дня, которую пригласивший задаёт приглашённому.
-    // При принятии копируется в User.workHours.
     workHours Int @default(8)
 
     companyId String  @db.ObjectId
@@ -112,8 +95,7 @@ model Project {
     image       String?
     description String?
 
-    client String?
-    // Числом, как и у задач: 3=HIGH, 2=MEDIUM, 1=LOW; null — без приоритета.
+    client    String?
     priority  Int?
     startDate DateTime?
     deadline  DateTime?
@@ -134,7 +116,6 @@ model Project {
     updatedAt DateTime @updatedAt
 }
 
-// Лента активности проекта.
 model Event {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
     type String
@@ -145,9 +126,7 @@ model Event {
     actorId String? @db.ObjectId
     actor   User?   @relation(fields: [actorId], references: [id])
 
-    // Имя задачи/материала на момент события — объект может быть удалён позже.
     targetName String?
-    // Доп. данные, напр. { from: 'TODO', to: 'DONE' }
     meta       Json?
 
     createdAt DateTime @default(now())
@@ -184,9 +163,7 @@ model Todo {
     authorId String? @db.ObjectId
     author   User?   @relation("TodoAuthor", fields: [authorId], references: [id])
 
-    status String @default("TODO")
-    // Числом, чтобы БД могла сортировать: 3=HIGH, 2=MEDIUM, 1=LOW; null — без приоритета.
-    // При сортировке desc null'ы уходят вниз (в BSON null < любого числа).
+    status        String    @default("TODO")
     priority      Int?
     dueDate       DateTime?
     estimateHours Int?
@@ -195,10 +172,10 @@ model Todo {
     comments    TodoComment[]
     attachments TodoAttachment[]
 
-    @@index([projectId, priority])
-
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@index([projectId, priority])
 }
 
 model TodoComment {
@@ -219,8 +196,6 @@ model TodoAttachment {
     id   String @id @default(auto()) @map("_id") @db.ObjectId
     name String
     data String
-    // Размер декодированного файла в байтах — чтобы считать занятое место
-    // одним _sum, не читая сами base64-строки.
     size Int
 
     todoId String @db.ObjectId
@@ -229,14 +204,12 @@ model TodoAttachment {
     authorId String @db.ObjectId
     author   User   @relation(fields: [authorId], references: [id])
 
-    // Денормализация: в Mongo нет джойнов, и без прямого companyId подсчёт квоты
-    // компании превращается в обход attachment → todo → project.
     companyId String  @db.ObjectId
     company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-    @@index([companyId])
-
     createdAt DateTime @default(now())
+
+    @@index([companyId])
 }
 
 model Material {
@@ -253,7 +226,7 @@ model Material {
 
     companyId String   @db.ObjectId
     company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-	project   Project? @relation(fields: [projectId], references: [id])
+    project   Project? @relation(fields: [projectId], references: [id])
     projectId String?  @db.ObjectId
 
     createdAt DateTime @default(now())
@@ -265,8 +238,6 @@ model MaterialCategory {
     label String
     color String
 
-    // Справочник у каждой компании свой: без этого поля категории всех компаний
-    // видны всем и засоряются чужими.
     companyId String  @db.ObjectId
     company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
