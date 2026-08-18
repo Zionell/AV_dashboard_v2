@@ -72,6 +72,30 @@ export default defineNuxtConfig({
     },
     compatibilityDate: '2025-07-15',
 
+    nitro: {
+        hooks: {
+            async compiled(nitro) {
+                const { copyFile, readdir } = await import('node:fs/promises');
+                const { join } = await import('node:path');
+
+                const from = join(nitro.options.rootDir, 'app/generated/prisma');
+                const to = nitro.options.output.serverDir;
+
+                const engines = (await readdir(from).catch(() => [] as string[])).filter(
+                    (file) => file.startsWith('libquery_engine') && file.endsWith('.node')
+                );
+
+                for (const file of engines) {
+                    await copyFile(join(from, file), join(to, file));
+                }
+
+                if (!engines.length) {
+                    console.warn(`[nitro] движок Prisma не найден в ${from} — прод-сборка не сможет ходить в базу`);
+                }
+            },
+        },
+    },
+
     vite: {
         optimizeDeps: {
             include: [
