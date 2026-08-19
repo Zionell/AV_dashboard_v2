@@ -8,6 +8,7 @@
         "start": "nuxt start",
         "dev": "nuxt dev",
         "postinstall": "nuxt prepare",
+        "vercel-build": "prisma generate && nuxt build",
         "prettier": "npx prettier . --write",
         "test": "vitest run --project unit",
         "test:watch": "vitest --project unit",

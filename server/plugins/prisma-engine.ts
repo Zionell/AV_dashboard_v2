@@ -5,29 +5,30 @@ import { fileURLToPath } from 'node:url';
 /**
  * Prisma грузит libquery_engine по абсолютному пути каталога генерации — тому, что был на
  * машине сборки. В деплой уезжает только бандл, и пути не совпадают: на Vercel собирается
- * в `/vercel/path0/prisma/generated/prisma`, а исполняется в `/var/task`. Любой запрос в базу
- * падает с PrismaClientInitializationError.
+ * в `/vercel/path0/prisma/generated/prisma`, а исполняется код в `/var/task`. Любой запрос
+ * в базу падает с PrismaClientInitializationError.
  *
  * Снаружи это выглядит как «сайт открылся, а вход не работает»: `/api/users/me` отдаёт 401
  * ещё до обращения к базе, поэтому оболочка рисуется, а падает первое же действие с базой.
  *
- * Файл движка кладёт рядом с серверным бандлом хук `nitro.hooks.compiled` в nuxt.config,
- * а здесь мы находим его и сообщаем Prisma явно — одного наличия файла недостаточно.
+ * Это наш аналог @prisma/nextjs-monorepo-workaround-plugin: сам файл движка кладёт рядом
+ * с бандлом хук в nuxt.config, а здесь мы находим его и сообщаем Prisma явно. Одного лишь
+ * наличия файла недостаточно — проверено, без переменной Prisma его не видит.
  */
 const ENGINE_FILE = /^libquery_engine-.*\.node$/;
 
 /**
- * Каталоги, где может лежать движок. На `import.meta.url` полагаться нельзя: Nitro
- * подменяет его на `globalThis._importMeta_.url`, и на момент запуска плагина там ещё
- * заглушка `file:///_entry.js` — dirname от неё даёт корень файловой системы.
- * Поэтому основной ориентир — рабочий каталог процесса: в лямбде это и есть корень бандла.
+ * Каталоги-кандидаты. На `import.meta.url` полагаться нельзя: Nitro подменяет его на
+ * `globalThis._importMeta_.url`, и на момент запуска плагина там ещё заглушка
+ * `file:///_entry.js` — dirname от неё даёт корень файловой системы. Поэтому основной
+ * ориентир — рабочий каталог процесса: в лямбде это и есть корень бандла.
  */
 function candidateDirs(): string[] {
     const cwd = process.cwd();
     const here = dirname(fileURLToPath(import.meta.url));
 
     return [
-        cwd, // Vercel: /var/task — туда попадает содержимое .output/server
+        cwd, // Vercel: /var/task — туда попадает содержимое серверного бандла
         join(cwd, '.output', 'server'), // локальный запуск `node .output/server/index.mjs`
         here,
         join(here, '..'),

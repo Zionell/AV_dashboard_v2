@@ -84,6 +84,47 @@ export default defineNuxtConfig({
         },
     },
 
+    /*
+     * Аналог @prisma/nextjs-monorepo-workaround-plugin, которого для Nitro не существует.
+     *
+     * Движок Prisma (libquery_engine-*.node) — бинарник, который грузится по пути в
+     * рантайме, а не через import, поэтому его не видит ни один сборщик и в бандл он не
+     * попадает. При этом в бандл запекается абсолютный путь каталога генерации с машины
+     * сборки: на Vercel это `/vercel/path0/prisma/generated/prisma`, а исполняется код уже
+     * в `/var/task`. Итог — все запросы в базу падают, снаружи это выглядит как сломанный вход.
+     *
+     * Слушателя вешаем через `nitro:init`, а НЕ через `nitro: { hooks: { compiled } }`:
+     * второй вариант замещает одноимённый хук пресета Vercel, тот перестаёт писать
+     * config.json и .vc-config.json, и деплой падает с «No Output Directory named "dist"».
+     *
+     * Путь до скопированного файла на старте проставляет server/plugins/prisma-engine.ts —
+     * без него Prisma движок рядом с бандлом не находит.
+     */
+    hooks: {
+        'nitro:init'(nitro) {
+            nitro.hooks.hook('compiled', async () => {
+                const { copyFile, readdir } = await import('node:fs/promises');
+                const { join } = await import('node:path');
+
+                // Должен совпадать с `output` в prisma/schema.prisma.
+                const from = join(nitro.options.rootDir, 'prisma/generated/prisma');
+                const to = nitro.options.output.serverDir;
+
+                const engines = (await readdir(from).catch(() => [] as string[])).filter(
+                    (file) => file.startsWith('libquery_engine') && file.endsWith('.node')
+                );
+
+                for (const file of engines) {
+                    await copyFile(join(from, file), join(to, file));
+                }
+
+                if (!engines.length) {
+                    console.warn(`[nitro] движок Prisma не найден в ${from} — прод-сборка не сможет ходить в базу`);
+                }
+            });
+        },
+    },
+
     // Security
     csurf: {
         https: !env.DEV,
