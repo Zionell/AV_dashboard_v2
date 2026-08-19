@@ -18,3 +18,11 @@ export const MAX_ATTACHMENTS_PER_TASK = 10;
  * читал одну и ту же причину.
  */
 export const READONLY_HINT = 'Демо-режим: только просмотр';
+
+/**
+ * Метка демо-входа в адресе: `/?mode=demo`. Ссылку раздаём наружу, поэтому имя параметра
+ * и его значение держим в одном месте — ими пользуется и мидлвар входа, и любая кнопка
+ * «Посмотреть демо».
+ */
+export const DEMO_MODE_PARAM = 'mode';
+export const DEMO_MODE_VALUE = 'demo';

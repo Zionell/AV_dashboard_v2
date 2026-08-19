@@ -10,6 +10,17 @@ const env: IEnv = {
     DEV: process.env.NODE_ENV === 'development',
 };
 
+/**
+ * Креды демо-пользователя. Лежат в публичном конфиге осознанно: вход по `?mode=demo`
+ * делает браузер обычным запросом на /api/auth/login, иначе кука сессии не дойдёт до него.
+ * Пара наружу открыта — под ней должен быть заведён пользователь с ролью TEST, которому
+ * сервер запрещает любую запись.
+ */
+const demo = {
+    email: process.env.NUXT_PUBLIC_DEMO_EMAIL || '',
+    password: process.env.NUXT_PUBLIC_DEMO_PASSWORD || '',
+};
+
 const breakpoints = {
     mobile: 767,
     tablet: 1279,
@@ -57,6 +68,10 @@ export default defineNuxtConfig({
     // Env
     runtimeConfig: {
         ...env,
+
+        public: {
+            demo,
+        },
     },
 
     // Route rules
