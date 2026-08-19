@@ -1,4 +1,6 @@
 export default defineNuxtRouteMiddleware((to, from) => {
+    if (!to.matched.length) return;
+
     const userStore = useUserStore();
     const user = userStore.user;
     const redirectUrl: string = from.query?.redirectUrl?.toString() || '';
