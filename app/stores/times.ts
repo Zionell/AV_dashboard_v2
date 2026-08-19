@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { onMounted } from 'vue';
-import type { Times } from '~/generated/prisma/client';
+import type { Times } from '~~/prisma/generated/prisma/client';
 
 const defaultTime = {
     hour: '00',

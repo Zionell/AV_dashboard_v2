@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ProjectLink } from '~/generated/prisma/client';
+import type { ProjectLink } from '~~/prisma/generated/prisma/client';
 
 const props = defineProps<{
     links: ProjectLink[];

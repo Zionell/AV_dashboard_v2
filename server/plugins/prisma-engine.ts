@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 /**
  * Prisma грузит libquery_engine по абсолютному пути каталога генерации — тому, что был на
  * машине сборки. В деплой уезжает только бандл, и пути не совпадают: на Vercel собирается
- * в `/vercel/path0/app/generated/prisma`, а исполняется в `/var/task`. Любой запрос в базу
+ * в `/vercel/path0/prisma/generated/prisma`, а исполняется в `/var/task`. Любой запрос в базу
  * падает с PrismaClientInitializationError.
  *
  * Снаружи это выглядит как «сайт открылся, а вход не работает»: `/api/users/me` отдаёт 401
@@ -61,7 +61,7 @@ export default defineNitroPlugin(() => {
         return;
     }
 
-    // В dev движок резолвится штатно из app/generated, поэтому молчим.
+    // В dev движок резолвится штатно из prisma/generated, поэтому молчим.
     if (!import.meta.dev) {
         console.warn('[prisma-engine] libquery_engine не найден рядом с бандлом — запросы в базу упадут');
     }
